@@ -9,10 +9,6 @@ interface Manifest {
     action: {
         default_popup: string
     }
-    options_ui: {
-        page: string
-        open_in_tab: boolean
-    }
     background: {
         service_worker: string
         type: string
@@ -55,18 +51,14 @@ const createBaseManifest = async (): Promise<Manifest> => {
             action: {
                 default_popup: './src/scripts/popup/popup.html'
             },
-            options_ui: {
-                page: './src/scripts/options/options.html',
-                open_in_tab: true
-            },
             background: {
                 service_worker: 'js/service-worker.js',
                 type: 'module'
             },
             icons: {
-                16: './assets/icon-16.png',
-                48: './assets/icon-48.png',
-                128: './assets/icon-128.png'
+                16: './assets/logo.png',
+                48: './assets/logo.png',
+                128: './assets/logo.png'
             },
             permissions: [],
             content_scripts: [
