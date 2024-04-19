@@ -60,7 +60,7 @@ const createBaseManifest = async (): Promise<Manifest> => {
                 48: './assets/logo.png',
                 128: './assets/logo.png'
             },
-            permissions: [],
+            permissions: ['contextMenus', 'activeTab', 'scripting'],
             content_scripts: [
                 {
                     matches: ['<all_urls>'],
@@ -89,7 +89,8 @@ const getManifest = async (resources: string[]): Promise<Manifest> => {
             ...baseManifest,
             web_accessible_resources: [
                 {
-                    matches: ['https://*/*', 'http://*/*'],
+                    // matches: ['https://*/*', 'http://*/*'],
+                    matches: ['<all_urls>'],
                     resources
                 }
             ]
