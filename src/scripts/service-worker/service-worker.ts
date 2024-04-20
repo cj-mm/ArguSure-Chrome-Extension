@@ -21,7 +21,7 @@ chrome.contextMenus.onClicked.addListener(info => {
     })
 })
 
-chrome.action.setBadgeText({ text: 'ON' })
+// chrome.action.setBadgeText({ text: 'ON' })
 
 // chrome.action.onClicked.addListener(() => {
 //     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
@@ -45,11 +45,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                     body.body,
                     body.source
                 )
-                sendResponse({ success: true, data: recorded })
+                if (recorded) {
+                    sendResponse({ success: true, data: recorded })
+                } else {
+                    sendResponse({ success: false, data: 'Failed request' })
+                }
             }
             record()
             return true
+        case 'get-user':
+            const getUser = async () => {
+                const user = await fetchUser()
+                if (user) {
+                    sendResponse({ success: true, data: user })
+                } else {
+                    sendResponse({ success: false, data: 'Failed request' })
+                }
+            }
+            getUser()
+            return true
         default:
+            console.log('default')
             break
     }
 })
@@ -74,11 +90,32 @@ const handleRecord = async (claim, summary, body, source) => {
         const data = await res.json()
         if (!res.ok) {
             console.log(data.message)
+            return false
         } else {
             return data
         }
     } catch (error) {
         console.log(error.message)
+        return false
+    }
+}
+
+const fetchUser = async () => {
+    try {
+        const res = await fetch('http://localhost:5000/api/user/getuser', {
+            method: 'GET',
+            mode: 'cors'
+        })
+        const data = await res.json()
+        if (!res.ok) {
+            console.log(data.message)
+            return false
+        } else {
+            return data
+        }
+    } catch (error) {
+        console.log(error.message)
+        return false
     }
 }
 

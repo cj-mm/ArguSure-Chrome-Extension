@@ -4,9 +4,11 @@ import { Button, Spinner, TextInput, Textarea } from 'flowbite-react'
 import { IoMdClose } from 'react-icons/io'
 import { MdOutlineDriveFileRenameOutline } from 'react-icons/md'
 import AppLogo from '../../assets/logo.png'
-import SkeletonLoader from '../components/SkeletonLoader'
+import BGLogo from '../../assets/bg-logo.png'
 import CounterargsContainer from '../components/CounterargsCountainer'
-// import ContentCounterargContainer from '../components/ContentCounterargContainer'
+import { signInSuccess } from '../../redux/user/userSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import type { RootState } from '../../redux/store'
 
 const App = () => {
     const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
@@ -20,29 +22,51 @@ const App = () => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const selectedClaim = useRef('')
+    const currentUser = useSelector((state: RootState) => state.user.currentUser)
+    const dispatch = useDispatch()
 
     useEffect(() => {
-        chrome.runtime.onMessage.addListener((res, sender, sendResponse) => {
+        chrome.runtime.onMessage.addListener(async (res, sender, sendResponse) => {
             const s = window.getSelection()
             const oRange = s.getRangeAt(0)
             const oRect = oRange.getBoundingClientRect()
             setTop(Math.round(oRect.top))
             setLeft(Math.round(oRect.left))
 
-            const data = res.data
-            selectedClaim.current = data.selectionText
-            setClaimEdit(selectedClaim.current)
+            const signedInUser = await getCurrentUser() // get signed in user
+            if (signedInUser) {
+                const data = res.data
+                selectedClaim.current = data.selectionText
+                setClaimEdit(selectedClaim.current)
+                generateCounterarguments()
+            }
             setIsOpen(true)
-            generateCounterarguments()
-
             sendResponse({ msg: 'Response from content script' })
-            return true
         })
     }, [])
 
     const handleChange = e => {
         setClaimEdit(e.target.value)
         selectedClaim.current = claimEdit
+    }
+
+    const getCurrentUser = async () => {
+        try {
+            const res = await chrome.runtime.sendMessage({
+                command: 'get-user'
+            })
+            if (res.success === false) {
+                setError(res.data)
+                dispatch(signInSuccess(null))
+                return false
+            } else {
+                setError(null)
+                dispatch(signInSuccess(res.data))
+                return true
+            }
+        } catch (error) {
+            setError(error.message)
+        }
     }
 
     const handleRecord = async (claim, summary, body, source) => {
@@ -52,7 +76,7 @@ const App = () => {
                 command: 'record-counterargs',
                 body: counterargData
             })
-            if (!res.success) {
+            if (res.success === false) {
                 setError(res.data)
             } else {
                 setError(null)
@@ -141,95 +165,125 @@ const App = () => {
 
     return (
         isOpen && (
-            <>
-                <div
-                    className="absolute p-2 bg-clight w-[33rem] h-[33rem] rounded cshadow"
-                    style={{ top: top, left: left }}
-                >
-                    <div className="flex gap-1">
-                        <img src={AppLogo} className="h-10 w-15 hover:cursor-pointer" />
-                        <div className="text-cgreen flex-1 text-left m-auto font-bold text-lg">
-                            <span className="hover:cursor-pointer">Lorem Ipsum</span>
-                        </div>
-                        <IoMdClose
-                            className="text-cblack hover:cursor-pointer"
-                            onClick={() => setIsOpen(false)}
-                            size={20}
-                        />
+            <div
+                className="absolute p-2 bg-clight w-[33rem] h-[33rem] rounded cshadow"
+                style={{ top: top, left: left }}
+            >
+                <div className="flex gap-1">
+                    <img src={AppLogo} className="h-10 w-15 hover:cursor-pointer" />
+                    <div className="text-cgreen flex-1 text-left m-auto font-bold text-lg">
+                        <span className="hover:cursor-pointer">Lorem Ipsum</span>
                     </div>
-                    <div>
-                        <div className="flex gap-2">
-                            <div className="flex-1 h-12 w-2/3 p-1 mt-2 bg-clightgreen rounded shadow-lg">
-                                <div className="flex gap-1 h-full">
-                                    {editing ? (
-                                        <form className="flex-1 mt-1">
-                                            <TextInput
-                                                type="text"
-                                                placeholder="Enter to edit"
-                                                onChange={handleChange}
-                                                value={claimEdit}
-                                                sizing="sm"
-                                            />
-                                        </form>
-                                    ) : (
-                                        <div className="flex flex-1 h-full text-cblack text-sm font-semibold items-center">
-                                            <span className="line-clamp-2">
-                                                <span className="underline">Input</span>: "
-                                                {selectedClaim.current}"
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            <span
-                                className="text-cbrown m-auto hover:cursor-pointer hover:text-yellow-800"
-                                onClick={() => setEditing(!editing)}
-                            >
-                                <MdOutlineDriveFileRenameOutline size={20} />
-                            </span>
-                        </div>
-                    </div>
-                    <div className="flex mx-2">
-                        <div className="flex-1 text-sm font-bold text-cblack mt-1">
-                            Why this might be wrong?
-                        </div>
-                        <div className="flex gap-3 text-cbrown text-xs justify-center underline mt-1">
-                            <span className="hover:cursor-pointer hover:text-yellow-800">
-                                Regenerate
-                            </span>
-                            <span className="hover:cursor-pointer hover:text-yellow-800">
-                                Go to homepage
-                            </span>
-                        </div>
-                    </div>
-                    <div className="h-[24rem] w-full overflow-auto p-1">
-                        {error ? (
-                            <div className="text-center mt-5 text-red-500">{error}</div>
-                        ) : (
-                            <></>
-                        )}
-                        <div className="text-cblack">
-                            {loading ? (
-                                <Spinner className="w-full m-auto mt-2 h-14 fill-cgreen" />
-                            ) : counterarguments.length !== 0 ? (
-                                <div>
-                                    {counterarguments.map((counterargument, index) => {
-                                        return (
-                                            <CounterargsContainer
-                                                key={index}
-                                                counterargument={counterargument}
-                                                withClaim={false}
-                                            />
-                                        )
-                                    })}
-                                </div>
-                            ) : (
-                                <div>No Counterarguments Generated</div>
-                            )}
-                        </div>
-                    </div>
+                    <IoMdClose
+                        className="text-cblack hover:cursor-pointer"
+                        onClick={() => setIsOpen(false)}
+                        size={20}
+                    />
                 </div>
-            </>
+                {currentUser ? (
+                    <div>
+                        <div>
+                            <div className="flex gap-2">
+                                <div className="flex-1 h-12 w-2/3 p-1 mt-2 bg-clightgreen rounded shadow-lg">
+                                    <div className="flex gap-1 h-full">
+                                        {editing ? (
+                                            <form className="flex-1 mt-1">
+                                                <TextInput
+                                                    type="text"
+                                                    placeholder="Enter to edit"
+                                                    onChange={handleChange}
+                                                    value={claimEdit}
+                                                    sizing="sm"
+                                                />
+                                            </form>
+                                        ) : (
+                                            <div className="flex flex-1 h-full text-cblack text-sm font-semibold items-center">
+                                                <span className="line-clamp-2">
+                                                    <span className="underline">Input</span>: "
+                                                    {selectedClaim.current}"
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                <span
+                                    className="text-cbrown m-auto hover:cursor-pointer hover:text-yellow-800"
+                                    onClick={() => setEditing(!editing)}
+                                >
+                                    <MdOutlineDriveFileRenameOutline size={20} />
+                                </span>
+                            </div>
+                        </div>
+                        <div className="flex mx-2">
+                            <div className="flex-1 text-sm font-bold text-cblack mt-1">
+                                Why this might be wrong?
+                            </div>
+                            <div className="flex gap-3 text-cbrown text-xs justify-center underline mt-1">
+                                <span className="hover:cursor-pointer hover:text-yellow-800">
+                                    Regenerate
+                                </span>
+                                <span className="hover:cursor-pointer hover:text-yellow-800">
+                                    Go to homepage
+                                </span>
+                            </div>
+                        </div>
+                        <div className="h-[24rem] w-full overflow-auto p-1">
+                            {error ? (
+                                <div className="text-center mt-5 text-red-500">{error}</div>
+                            ) : (
+                                <></>
+                            )}
+                            <div className="text-cblack">
+                                {loading ? (
+                                    <Spinner className="w-full m-auto mt-24 h-14 fill-cgreen" />
+                                ) : counterarguments.length !== 0 ? (
+                                    <div>
+                                        {counterarguments.map((counterargument, index) => {
+                                            return (
+                                                <CounterargsContainer
+                                                    key={index}
+                                                    counterargument={counterargument}
+                                                    withClaim={false}
+                                                />
+                                            )
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div>No Counterarguments Generated</div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex flex-col gap-10 text-center w-full py-10 px-5 overflow-hidden">
+                        <img src={BGLogo} className="absolute top-5 left-0 z-0" />
+                        <div className="text-4xl text-cgreen font-extrabold z-10">
+                            Lorem Ipsum Dolor
+                        </div>
+                        <div className="text-cblack italic z-10">
+                            ..... Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                            sodales velit vulputate magna euismod, vel maximus quam aliquam. Nulla
+                            eu sem vitae metus fringilla fermentum. Integer ante tortor, dictum a
+                            augue eget, efficitur tristique tellus. Quisque pretium feugiat blandit.
+                            Nam scelerisque rutrum dolor eget finibus. Vivamus nec nisl ultrices,
+                            auctor ante vitae, lacinia lorem. Aenean ullamcorper tristique
+                            ullamcorper. Vestibulum finibus erat nibh, nec mollis nisl eleifend non
+                            .....
+                        </div>
+                        <div className="gap-3 z-10  w-full justify-center text-cblack font-bold">
+                            Need to{' '}
+                            <span className="text-cbrown underline hover:cursor-pointer">
+                                Sign in
+                            </span>{' '}
+                            or{' '}
+                            <span className="text-cbrown underline hover:cursor-pointer">
+                                Sign up
+                            </span>{' '}
+                            first
+                        </div>
+                    </div>
+                )}
+            </div>
         )
     )
 }
