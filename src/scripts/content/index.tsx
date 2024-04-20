@@ -5,6 +5,7 @@ import App from './App'
 import { persistor, store } from '../../redux/store.js'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
+import { BrowserRouter } from 'react-router-dom'
 
 const isProduction: boolean = process.env.NODE_ENV === 'production'
 const ROOT_ID = 'RENAME_ME_IF_YOU_WANT'
@@ -37,7 +38,9 @@ const injectReact = (rootId: string): void => {
                     {isProduction && <style>{styles.toString()}</style>}
                     <PersistGate persistor={persistor}>
                         <Provider store={store}>
-                            <App />
+                            <BrowserRouter>
+                                <App />
+                            </BrowserRouter>
                         </Provider>
                     </PersistGate>
                 </>

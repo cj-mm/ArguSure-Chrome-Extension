@@ -9,6 +9,7 @@ import CounterargsContainer from '../components/CounterargsCountainer'
 import { signInSuccess } from '../../redux/user/userSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import type { RootState } from '../../redux/store'
+import { Link } from 'react-router-dom'
 
 const App = () => {
     const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
@@ -24,6 +25,9 @@ const App = () => {
     const selectedClaim = useRef('')
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const dispatch = useDispatch()
+    const homepageRoute = 'http://localhost:5174/'
+    const signinRoute = 'http://localhost:5174/sign-in'
+    const signupRoute = 'http://localhost:5174/sign-up'
 
     useEffect(() => {
         chrome.runtime.onMessage.addListener(async (res, sender, sendResponse) => {
@@ -47,7 +51,7 @@ const App = () => {
 
     const handleChange = e => {
         setClaimEdit(e.target.value)
-        selectedClaim.current = claimEdit
+        selectedClaim.current = e.target.value
     }
 
     const getCurrentUser = async () => {
@@ -170,9 +174,13 @@ const App = () => {
                 style={{ top: top, left: left }}
             >
                 <div className="flex gap-1">
-                    <img src={AppLogo} className="h-10 w-15 hover:cursor-pointer" />
+                    <Link to={homepageRoute} target="_blank" rel="noopener noreferrer">
+                        <img src={AppLogo} className="h-10 w-15 hover:cursor-pointer" />
+                    </Link>
                     <div className="text-cgreen flex-1 text-left m-auto font-bold text-lg">
-                        <span className="hover:cursor-pointer">Lorem Ipsum</span>
+                        <Link to={homepageRoute} target="_blank" rel="noopener noreferrer">
+                            <span className="hover:cursor-pointer">Lorem Ipsum</span>
+                        </Link>
                     </div>
                     <IoMdClose
                         className="text-cblack hover:cursor-pointer"
@@ -187,7 +195,14 @@ const App = () => {
                                 <div className="flex-1 h-12 w-2/3 p-1 mt-2 bg-clightgreen rounded shadow-lg">
                                     <div className="flex gap-1 h-full">
                                         {editing ? (
-                                            <form className="flex-1 mt-1">
+                                            <form
+                                                className="flex-1 mt-1"
+                                                onSubmit={e => {
+                                                    e.preventDefault()
+                                                    setEditing(false)
+                                                    generateCounterarguments()
+                                                }}
+                                            >
                                                 <TextInput
                                                     type="text"
                                                     placeholder="Enter to edit"
@@ -206,12 +221,18 @@ const App = () => {
                                         )}
                                     </div>
                                 </div>
-                                <span
-                                    className="text-cbrown m-auto hover:cursor-pointer hover:text-yellow-800"
-                                    onClick={() => setEditing(!editing)}
-                                >
-                                    <MdOutlineDriveFileRenameOutline size={20} />
-                                </span>
+                                {loading ? (
+                                    <span className="text-cbrown m-auto hover:cursor-not-allowed">
+                                        <MdOutlineDriveFileRenameOutline size={20} />
+                                    </span>
+                                ) : (
+                                    <span
+                                        className="text-cbrown m-auto hover:cursor-pointer hover:text-yellow-800"
+                                        onClick={() => setEditing(!editing)}
+                                    >
+                                        <MdOutlineDriveFileRenameOutline size={20} />
+                                    </span>
+                                )}
                             </div>
                         </div>
                         <div className="flex mx-2">
@@ -219,15 +240,24 @@ const App = () => {
                                 Why this might be wrong?
                             </div>
                             <div className="flex gap-3 text-cbrown text-xs justify-center underline mt-1">
-                                <span className="hover:cursor-pointer hover:text-yellow-800">
-                                    Regenerate
-                                </span>
-                                <span className="hover:cursor-pointer hover:text-yellow-800">
-                                    Go to homepage
-                                </span>
+                                {loading ? (
+                                    <span className="hover:cursor-not-allowed">Regenerate</span>
+                                ) : (
+                                    <span
+                                        className="hover:cursor-pointer hover:text-yellow-800"
+                                        onClick={() => generateCounterarguments()}
+                                    >
+                                        Regenerate
+                                    </span>
+                                )}
+                                <Link to={homepageRoute} target="_blank" rel="noopener noreferrer">
+                                    <span className="hover:cursor-pointer hover:text-yellow-800">
+                                        Go to homepage
+                                    </span>
+                                </Link>
                             </div>
                         </div>
-                        <div className="h-[24rem] w-full overflow-auto p-1">
+                        <div className="h-[24rem] w-full overflow-auto p-1 border-2 border-gray-200">
                             {error ? (
                                 <div className="text-center mt-5 text-red-500">{error}</div>
                             ) : (
@@ -249,7 +279,11 @@ const App = () => {
                                         })}
                                     </div>
                                 ) : (
-                                    <div>No Counterarguments Generated</div>
+                                    !error && (
+                                        <div className="text-center">
+                                            No Counterarguments Generated
+                                        </div>
+                                    )
                                 )}
                             </div>
                         </div>
@@ -272,13 +306,17 @@ const App = () => {
                         </div>
                         <div className="gap-3 z-10  w-full justify-center text-cblack font-bold">
                             Need to{' '}
-                            <span className="text-cbrown underline hover:cursor-pointer">
-                                Sign in
-                            </span>{' '}
+                            <Link to={signinRoute} target="_blank" rel="noopener noreferrer">
+                                <span className="text-cbrown underline hover:cursor-pointer">
+                                    Sign in
+                                </span>
+                            </Link>{' '}
                             or{' '}
-                            <span className="text-cbrown underline hover:cursor-pointer">
-                                Sign up
-                            </span>{' '}
+                            <Link to={signupRoute} target="_blank" rel="noopener noreferrer">
+                                <span className="text-cbrown underline hover:cursor-pointer">
+                                    Sign up
+                                </span>
+                            </Link>{' '}
                             first
                         </div>
                     </div>
