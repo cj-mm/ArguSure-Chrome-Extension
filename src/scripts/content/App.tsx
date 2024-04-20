@@ -3,11 +3,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import { Button, Spinner, TextInput, Textarea } from 'flowbite-react'
 import { IoMdClose } from 'react-icons/io'
 import { MdOutlineDriveFileRenameOutline } from 'react-icons/md'
-// import ContentCounterargContainer from '../components/ContentCounterargContainer'
-// import SkeletonLoader from '../components/SkeletonLoader'
-// import ContentSkeletonLoader from '../components/ContentSkeletonLoader'
 import AppLogo from '../../assets/logo.png'
 import SkeletonLoader from '../components/SkeletonLoader'
+// import ContentCounterargContainer from '../components/ContentCounterargContainer'
 
 const App = () => {
     const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
@@ -119,17 +117,16 @@ const App = () => {
                 counterargs.push(counterarg)
             }
 
-            for (let i = 0; i < counterargs.length; i++) {
-                const counterarg = counterargs[i]
-                const data = await handleRecord(
-                    claim.slice(1, -1),
-                    counterarg.summary,
-                    counterarg.body,
-                    counterarg.source
-                )
-                counterargs[i] = data
-            }
-            console.log(counterargs)
+            // for (let i = 0; i < counterargs.length; i++) {
+            //     const counterarg = counterargs[i]
+            //     const data = await handleRecord(
+            //         claim.slice(1, -1),
+            //         counterarg.summary,
+            //         counterarg.body,
+            //         counterarg.source
+            //     )
+            //     counterargs[i] = data
+            // }
             setCounterarguments(counterargs)
             setLoading(false)
             setError(null)
@@ -145,7 +142,7 @@ const App = () => {
         isOpen && (
             <>
                 <div
-                    className="absolute p-2 bg-clight w-[33rem] h-[33rem] rounded shadow-xl border-2 border-cgreen cshadow"
+                    className="absolute p-2 bg-clight w-[33rem] h-[33rem] rounded cshadow"
                     style={{ top: top, left: left }}
                 >
                     <div className="flex gap-1">
@@ -212,7 +209,7 @@ const App = () => {
                         )}
                         <div className="text-cblack">
                             {loading ? (
-                                <SkeletonLoader />
+                                <Spinner className="w-full m-auto mt-2 h-14 fill-cgreen" />
                             ) : counterarguments.length !== 0 ? (
                                 <div>
                                     {counterarguments.map((counterargument, index) => {
