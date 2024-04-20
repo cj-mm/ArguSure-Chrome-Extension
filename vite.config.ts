@@ -36,7 +36,13 @@ export default defineConfig({
         alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }]
     },
     server: {
-        open: './src/index.html'
+        open: './src/index.html',
+        proxy: {
+            '/api': {
+                target: 'http://localhost:5000',
+                secure: false
+            }
+        }
     },
     build: {
         modulePreload: {
