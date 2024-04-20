@@ -1,5 +1,6 @@
-console.log('Background Service Worker Loaded')
+import { handleRecord, fetchUser, fetchHandleLike } from './api-req-handler'
 
+console.log('Background Service Worker Loaded')
 chrome.runtime.onInstalled.addListener(async () => {
     console.log('Extension installed')
     chrome.contextMenus.create({
@@ -20,15 +21,6 @@ chrome.contextMenus.onClicked.addListener(info => {
         })
     })
 })
-
-// chrome.action.setBadgeText({ text: 'ON' })
-
-// chrome.action.onClicked.addListener(() => {
-//     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-//         const activeTab = tabs[0]
-//         chrome.tabs.sendMessage(activeTab.id!, { message: 'clicked_browser_action' })
-//     })
-// })
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const { command, body } = message
@@ -64,6 +56,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             }
             getUser()
             return true
+        case 'handle-like':
+            const handleLike = async () => {
+                const likeRes = await fetchHandleLike(body)
+                if (likeRes) {
+                    sendResponse({ success: true, data: likeRes })
+                } else {
+                    sendResponse({ success: false, data: 'Failed request' })
+                }
+            }
+            handleLike()
+            return true
         default:
             console.log('default')
             break
@@ -78,45 +81,13 @@ chrome.commands.onCommand.addListener(command => {
     }
 })
 
-const handleRecord = async (claim, summary, body, source) => {
-    const counterargData = { inputClaim: claim, summary, body, source }
-    try {
-        const res = await fetch('http://localhost:5000/api/counterarg/record', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(counterargData),
-            mode: 'cors'
-        })
-        const data = await res.json()
-        if (!res.ok) {
-            console.log(data.message)
-            return false
-        } else {
-            return data
-        }
-    } catch (error) {
-        console.log(error.message)
-        return false
-    }
-}
+// chrome.action.setBadgeText({ text: 'ON' })
 
-const fetchUser = async () => {
-    try {
-        const res = await fetch('http://localhost:5000/api/user/getuser', {
-            method: 'GET',
-            mode: 'cors'
-        })
-        const data = await res.json()
-        if (!res.ok) {
-            console.log(data.message)
-            return false
-        } else {
-            return data
-        }
-    } catch (error) {
-        console.log(error.message)
-        return false
-    }
-}
+// chrome.action.onClicked.addListener(() => {
+//     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+//         const activeTab = tabs[0]
+//         chrome.tabs.sendMessage(activeTab.id!, { message: 'clicked_browser_action' })
+//     })
+// })
 
 export {}

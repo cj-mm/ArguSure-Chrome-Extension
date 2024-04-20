@@ -4,7 +4,6 @@ import { BiDislike, BiLike, BiSolidDislike, BiSolidLike } from 'react-icons/bi'
 import { BsThreeDots } from 'react-icons/bs'
 import { FiSave, FiFileMinus } from 'react-icons/fi'
 import { RiPlayListAddFill } from 'react-icons/ri'
-import { IoIosRemoveCircleOutline } from 'react-icons/io'
 import { Avatar, Dropdown } from 'flowbite-react'
 import { updateSuccess } from '../../redux/user/userSlice'
 import {
@@ -39,26 +38,25 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
     }
 
     const handleLike = async action => {
-        // const dataBody = {
-        //     userId: counterargument.userId,
-        //     _id: counterargument._id,
-        //     liked: action
-        // }
-        // try {
-        //     const res = await fetch('/api/counterarg/like', {
-        //         method: 'PUT',
-        //         headers: { 'Content-Type': 'application/json' },
-        //         body: JSON.stringify(dataBody)
-        //     })
-        //     const data = await res.json()
-        //     if (!res.ok) {
-        //         console.log(data.message)
-        //     } else {
-        //         setLiked(action)
-        //     }
-        // } catch (error) {
-        //     console.log(error.message)
-        // }
+        const dataBody = {
+            userId: counterargument.userId,
+            _id: counterargument._id,
+            liked: action
+        }
+
+        try {
+            const res = await chrome.runtime.sendMessage({
+                command: 'handle-like',
+                body: dataBody
+            })
+            if (res.success === false) {
+                console.log(res.data)
+            } else {
+                setLiked(action)
+            }
+        } catch (error) {
+            console.log(error.message)
+        }
     }
 
     const handleSave = async () => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { Button, Spinner, TextInput, Textarea } from 'flowbite-react'
+import { Spinner, TextInput } from 'flowbite-react'
 import { IoMdClose } from 'react-icons/io'
 import { MdOutlineDriveFileRenameOutline } from 'react-icons/md'
 import AppLogo from '../../assets/logo.png'
