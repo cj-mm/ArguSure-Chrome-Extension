@@ -61,3 +61,24 @@ export const fetchHandleLike = async dataBody => {
         return false
     }
 }
+
+export const fetchHandleSave = async dataBody => {
+    try {
+        const res = await fetch(backendServerRoute + '/api/saved/save', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataBody),
+            mode: 'cors'
+        })
+        const data = await res.json()
+        if (!res.ok) {
+            console.log(data.message)
+            return false
+        } else {
+            return data
+        }
+    } catch (error) {
+        console.log(error.message)
+        return false
+    }
+}

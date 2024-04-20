@@ -1,4 +1,4 @@
-import { handleRecord, fetchUser, fetchHandleLike } from './api-req-handler'
+import { handleRecord, fetchUser, fetchHandleLike, fetchHandleSave } from './api-req-handler'
 
 console.log('Background Service Worker Loaded')
 chrome.runtime.onInstalled.addListener(async () => {
@@ -66,6 +66,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 }
             }
             handleLike()
+            return true
+        case 'handle-save':
+            const handleSave = async () => {
+                const saveRes = await fetchHandleSave(body)
+                if (saveRes) {
+                    sendResponse({ success: true, data: saveRes })
+                } else {
+                    sendResponse({ success: false, data: 'Failed request' })
+                }
+            }
+            handleSave()
             return true
         default:
             console.log('default')

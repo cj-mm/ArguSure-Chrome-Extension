@@ -15,7 +15,6 @@ import {
 } from '../../redux/counterargument/counterargSlice'
 import type { RootState } from '../../redux/store'
 // import SaveTo from './SaveTo'
-import { useParams } from 'react-router-dom'
 // import UnsaveModal from './UnsaveModal'
 
 export default function CounterargsContainer({ counterargument, withClaim }) {
@@ -31,7 +30,6 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const savedCounterargs = useSelector((state: RootState) => state.counterarg.savedCounterargs)
     const dispatch = useDispatch()
-    const { topicSlug } = useParams()
 
     const handleRead = () => {
         setReadMore(!readMore)
@@ -43,7 +41,6 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
             _id: counterargument._id,
             liked: action
         }
-
         try {
             const res = await chrome.runtime.sendMessage({
                 command: 'handle-like',
@@ -60,39 +57,26 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
     }
 
     const handleSave = async () => {
-        // let savedTo = []
-        // if (topicSlug) {
-        //     for (let i = 0; i < currentUser.saved.length; i++) {
-        //         const topic = currentUser.saved[i]
-        //         if (
-        //             topic.counterarguments.includes(counterargument._id) ||
-        //             topic.slug === topicSlug
-        //         ) {
-        //             savedTo.push(topic.topicName)
-        //         }
-        //     }
-        // }
-        // const dataBody = {
-        //     userId: currentUser._id,
-        //     counterargId: counterargument._id,
-        //     selectedTopics: topicSlug ? savedTo : ['default']
-        // }
-        // try {
-        //     const res = await fetch('/api/saved/save', {
-        //         method: 'PUT',
-        //         headers: { 'Content-Type': 'application/json' },
-        //         body: JSON.stringify(dataBody)
-        //     })
-        //     const data = await res.json()
-        //     if (!res.ok) {
-        //         console.log(data.message)
-        //     } else {
-        //         dispatch(addToSavedCounterargs(counterargument._id))
-        //         dispatch(updateSuccess(data.userWithUpdatedSaved))
-        //     }
-        // } catch (error) {
-        //     console.log(error.message)
-        // }
+        const dataBody = {
+            userId: currentUser._id,
+            counterargId: counterargument._id,
+            selectedTopics: ['default']
+        }
+
+        try {
+            const res = await chrome.runtime.sendMessage({
+                command: 'handle-save',
+                body: dataBody
+            })
+            if (res.success === false) {
+                console.log(res.data)
+            } else {
+                dispatch(addToSavedCounterargs(counterargument._id))
+                dispatch(updateSuccess(res.data.userWithUpdatedSaved))
+            }
+        } catch (error) {
+            console.log(error.message)
+        }
     }
 
     const handleUnsave = async () => {
