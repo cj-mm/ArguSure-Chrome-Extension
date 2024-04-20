@@ -2,6 +2,9 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import styles from '@/styles/index.css?inline'
 import App from './App'
+import { persistor, store } from '../../redux/store.js'
+import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react'
 
 const isProduction: boolean = process.env.NODE_ENV === 'production'
 const ROOT_ID = 'RENAME_ME_IF_YOU_WANT'
@@ -32,7 +35,11 @@ const injectReact = (rootId: string): void => {
             <React.StrictMode>
                 <>
                     {isProduction && <style>{styles.toString()}</style>}
-                    <App />
+                    <PersistGate persistor={persistor}>
+                        <Provider store={store}>
+                            <App />
+                        </Provider>
+                    </PersistGate>
                 </>
             </React.StrictMode>
         )
