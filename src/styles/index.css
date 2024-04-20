@@ -7,3 +7,33 @@
         0 4px 8px 0 rgba(0, 0, 0, 0.3),
         0 6px 20px 0 rgba(0, 0, 0, 0.3);
 }
+
+.cshadow-sm {
+    box-shadow:
+        0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.2);
+}
+
+.home-input textarea {
+    border-color: #705d55;
+}
+
+.read-more {
+    box-shadow: 0px -3px 10px #f0f7f4;
+}
+
+.search-input input {
+    border-color: #705d55;
+}
+
+.saveto-modal [role='dialog'] div {
+    max-height: 35rem;
+}
+
+.addtopic-modal [role='dialog'] {
+    width: 15rem;
+}
+
+[data-testid='modal-overlay'] {
+    background-color: rgba(17, 24, 39, 0.3);
+}

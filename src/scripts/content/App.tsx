@@ -5,6 +5,7 @@ import { IoMdClose } from 'react-icons/io'
 import { MdOutlineDriveFileRenameOutline } from 'react-icons/md'
 import AppLogo from '../../assets/logo.png'
 import SkeletonLoader from '../components/SkeletonLoader'
+import CounterargsContainer from '../components/CounterargsCountainer'
 // import ContentCounterargContainer from '../components/ContentCounterargContainer'
 
 const App = () => {
@@ -117,16 +118,16 @@ const App = () => {
                 counterargs.push(counterarg)
             }
 
-            // for (let i = 0; i < counterargs.length; i++) {
-            //     const counterarg = counterargs[i]
-            //     const data = await handleRecord(
-            //         claim.slice(1, -1),
-            //         counterarg.summary,
-            //         counterarg.body,
-            //         counterarg.source
-            //     )
-            //     counterargs[i] = data
-            // }
+            for (let i = 0; i < counterargs.length; i++) {
+                const counterarg = counterargs[i]
+                const data = await handleRecord(
+                    claim.slice(1, -1),
+                    counterarg.summary,
+                    counterarg.body,
+                    counterarg.source
+                )
+                counterargs[i] = data
+            }
             setCounterarguments(counterargs)
             setLoading(false)
             setError(null)
@@ -201,7 +202,7 @@ const App = () => {
                             </span>
                         </div>
                     </div>
-                    <div className="h-[23.5rem] w-full overflow-auto border-2 border-gray-200 rounded p-1 mt-1">
+                    <div className="h-[24rem] w-full overflow-auto p-1">
                         {error ? (
                             <div className="text-center mt-5 text-red-500">{error}</div>
                         ) : (
@@ -214,12 +215,11 @@ const App = () => {
                                 <div>
                                     {counterarguments.map((counterargument, index) => {
                                         return (
-                                            // <ContentCounterargContainer
-                                            //     key={index}
-                                            //     counterargument={counterargument}
-                                            //     withClaim={false}
-                                            // />
-                                            counterargument.summary
+                                            <CounterargsContainer
+                                                key={index}
+                                                counterargument={counterargument}
+                                                withClaim={false}
+                                            />
                                         )
                                     })}
                                 </div>
