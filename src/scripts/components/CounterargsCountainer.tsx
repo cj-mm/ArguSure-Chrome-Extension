@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { BiDislike, BiLike, BiSolidDislike, BiSolidLike } from 'react-icons/bi'
 import { BsThreeDots } from 'react-icons/bs'
@@ -14,8 +14,8 @@ import {
     setUnsaveDataBody
 } from '../../redux/counterargument/counterargSlice'
 import type { RootState } from '../../redux/store'
-// import SaveTo from './SaveTo'
 // import UnsaveModal from './UnsaveModal'
+// import SaveTo from './SaveTo'
 
 export default function CounterargsContainer({ counterargument, withClaim }) {
     const claim =
@@ -30,6 +30,13 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const savedCounterargs = useSelector((state: RootState) => state.counterarg.savedCounterargs)
     const dispatch = useDispatch()
+    const backendServerRoute = 'http://localhost:5000'
+
+    const getCookie = () => {
+        const value = `; ${document.cookie}`
+        const parts = value.split(`; access_token=`)
+        if (parts.length === 2) return parts.pop().split(';').shift()
+    }
 
     const handleRead = () => {
         setReadMore(!readMore)
@@ -42,12 +49,18 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
             liked: action
         }
         try {
-            const res = await chrome.runtime.sendMessage({
-                command: 'handle-like',
-                body: dataBody
-            })
-            if (res.success === false) {
-                console.log(res.data)
+            const res = await fetch(
+                `${backendServerRoute}/api/counterarg/like?cookie=${getCookie()}`,
+                {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataBody)
+                }
+            )
+            const data = await res.json()
+
+            if (!res.ok) {
+                console.log(data.message)
             } else {
                 setLiked(action)
             }
@@ -57,45 +70,40 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
     }
 
     const handleSave = async () => {
-        const dataBody = {
-            userId: currentUser._id,
-            counterargId: counterargument._id,
-            selectedTopics: ['default']
-        }
-
-        try {
-            const res = await chrome.runtime.sendMessage({
-                command: 'handle-save',
-                body: dataBody
-            })
-            if (res.success === false) {
-                console.log(res.data)
-            } else {
-                dispatch(addToSavedCounterargs(counterargument._id))
-                dispatch(updateSuccess(res.data.userWithUpdatedSaved))
-            }
-        } catch (error) {
-            console.log(error.message)
-        }
+        // const dataBody = {
+        //     userId: currentUser._id,
+        //     counterargId: counterargument._id,
+        //     selectedTopics: ['default']
+        // }
+        // try {
+        //     const res = await chrome.runtime.sendMessage({
+        //         command: 'handle-save',
+        //         body: dataBody
+        //     })
+        //     if (res.success === false) {
+        //         console.log(res.data)
+        //     } else {
+        //         dispatch(addToSavedCounterargs(counterargument._id))
+        //         dispatch(updateSuccess(res.data.userWithUpdatedSaved))
+        //     }
+        // } catch (error) {
+        //     console.log(error.message)
+        // }
     }
 
     const handleUnsave = async () => {
         // let savedTo = []
-        // let removeFromTopic = ''
         // for (let i = 0; i < currentUser.saved.length; i++) {
         //     const topic = currentUser.saved[i]
         //     if (topic.counterarguments.includes(counterargument._id)) {
         //         savedTo.push(topic.topicName)
-        //     }
-        //     if (topic.slug === topicSlug) {
-        //         removeFromTopic = topic.topicName
         //     }
         // }
         // const dataBody = {
         //     userId: currentUser._id,
         //     counterargId: counterargument._id,
         //     savedTo: savedTo,
-        //     removeFrom: topicSlug ? removeFromTopic : savedTo
+        //     removeFrom: savedTo
         // }
         // dispatch(setUnsaveDataBody(dataBody))
         // dispatch(showUnsaveModal())
@@ -108,11 +116,12 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
                     <u>Input claim</u>: {claim}
                 </div>
             )}
-            <div className={'flex gap-2 p-2 ' + (readMore ? 'h-full' : 'h-28')}>
+            <div className={'flex gap-3 p-2 ' + (readMore ? 'h-full' : 'h-32')}>
                 <div className="flex flex-col gap-0 text-justify max-w-[50rem]">
                     <div className="overflow-hidden">
-                        <div className="font-semibold text-[0.78rem] italic">{summary}</div>
-                        <div className=" mt-2 text-[0.78rem]">
+                        {/* text-[0.80rem] */}
+                        <div className="font-semibold text-sm italic">{summary}</div>
+                        <div className=" mt-2 text-sm">
                             <div>{body}</div>
                             <div className="mt-2">
                                 <span className="font-semibold">Source:</span>
@@ -173,10 +182,10 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
                             </Dropdown.Item>
                         </Dropdown>
                     </div>
-                    <div className="flex gap-2 mt-3">
+                    <div className="flex gap-2 mt-5">
                         {liked !== 'liked' ? (
                             <BiLike
-                                className="size-4 hover:cursor-pointer hover:text-cbrown"
+                                className="size-5 hover:cursor-pointer hover:text-cbrown"
                                 onClick={() => handleLike('liked')}
                             />
                         ) : (
@@ -199,8 +208,8 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
                     </div>
                 </div>
             </div>
-            {/* <SaveTo />
-            <UnsaveModal /> */}
+            {/* <SaveTo /> */}
+            {/* <UnsaveModal /> */}
         </div>
     )
 }
