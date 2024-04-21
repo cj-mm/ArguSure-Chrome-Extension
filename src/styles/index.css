@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+    background-color: #f0f7f4;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* background-image: url('../assets/bg-logo.png');
+    background-repeat: no-repeat;
+    background-position: 25%;
+    background-size: 50em;
+    background-attachment: fixed; */
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
 .cshadow {
     box-shadow:
         0 4px 8px 0 rgba(0, 0, 0, 0.3),
@@ -36,4 +52,12 @@
 
 [data-testid='modal-overlay'] {
     background-color: rgba(17, 24, 39, 0.3);
+}
+
+.landing-page {
+    background-image: url('../assets/bg-logo.png');
+    background-repeat: no-repeat;
+    background-position-x: left;
+    background-size: 30em;
+    background-attachment: relative;
 }

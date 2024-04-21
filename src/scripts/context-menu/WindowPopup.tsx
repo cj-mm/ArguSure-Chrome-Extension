@@ -3,14 +3,13 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import { Spinner, TextInput } from 'flowbite-react'
 import { MdOutlineDriveFileRenameOutline } from 'react-icons/md'
 import AppLogo from '../../assets/logo.png'
-import BGLogo from '../../assets/bg-logo.png'
 import CounterargsContainer from '../components/CounterargsCountainer'
 import { signInSuccess } from '../../redux/user/userSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import type { RootState } from '../../redux/store'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
-const App = () => {
+const WindowPopup = () => {
     const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
     const [counterarguments, setCounterarguments] = useState([])
@@ -21,16 +20,19 @@ const App = () => {
     const selectedClaim = useRef('')
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const dispatch = useDispatch()
+    const location = useLocation()
     const homepageRoute = 'http://localhost:5174/'
     const signinRoute = 'http://localhost:5174/sign-in'
     const signupRoute = 'http://localhost:5174/sign-up'
+    const backendServerRoute = 'http://localhost:5000'
 
     useEffect(() => {
         const onMount = async () => {
             await getCurrentUser() // get signed in user
             if (currentUser) {
+                selectedClaim.current = new URLSearchParams(location.search).get('selectedText')
                 setClaimEdit(selectedClaim.current)
-                // generateCounterarguments()
+                generateCounterarguments()
             }
         }
         onMount()
@@ -44,78 +46,62 @@ const App = () => {
     const getCurrentUser = async () => {
         try {
             const res = await fetch(
-                `http://localhost:5000/api/user/getuser?cookie=${getCookie()}`,
+                `${backendServerRoute}/api/user/getuser?cookie=${getCookie()}`,
                 {
                     method: 'GET',
                     mode: 'cors'
                 }
             )
             const data = await res.json()
-            console.log('WAHAHAHAHHA HAHAH')
-            console.log(data)
             if (!res.ok) {
-                console.log('WAHAHAHAHHA FAILED')
-                console.log(data.message)
+                setError(data.message)
                 dispatch(signInSuccess(null))
-                // return false
             } else {
-                console.log('WAHAHAHAHHA SUCCESS')
                 console.log(data)
                 setError(null)
                 dispatch(signInSuccess(data))
-                // return data
-            }
-        } catch (error) {
-            console.log(error.message)
-            return false
-        }
-    }
-
-    const handleRecord = async (claim, summary, body, source) => {
-        const counterargData = { inputClaim: claim, summary, body, source }
-        try {
-            const res = await chrome.runtime.sendMessage({
-                command: 'record-counterargs',
-                body: counterargData
-            })
-            if (res.success === false) {
-                setError(res.data)
-            } else {
-                setError(null)
-                return res.data
             }
         } catch (error) {
             setError(error.message)
         }
     }
 
+    const handleRecord = async (claim, summary, body, source) => {
+        const counterargData = { inputClaim: claim, summary, body, source }
+        try {
+            const res = await fetch(
+                `${backendServerRoute}/api/counterarg/record?cookie=${getCookie()}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(counterargData)
+                }
+            )
+            const data = await res.json()
+            if (!res.ok) {
+                setError(data.message)
+            } else {
+                setError(null)
+                return data
+            }
+        } catch (error) {
+            setError('Something went wrong')
+        }
+    }
+
     const generateCounterarguments = async () => {
         try {
-            ////
-            selectedClaim.current = 'self driving cars'
-            ////
             if (!selectedClaim.current) {
                 setError('Please select something!')
                 setLoading(false)
                 setCounterarguments([])
                 return
             }
-            // currentInput.current = inputClaim
             setError(null)
             setLoading(true)
             const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
 
             const chat = model.startChat({
-                // history: [
-                //   {
-                //     role: "user",
-                //     parts: "Hello!",
-                //   },
-                //   {
-                //     role: "model",
-                //     parts: "Great to meet you. What would you like to know?",
-                //   },
-                // ],
                 generationConfig: {
                     maxOutputTokens: 4096
                 }
@@ -176,22 +162,25 @@ const App = () => {
 
     return (
         <div className="flex w-screen h-screen">
-            <div className="m-auto p-2 bg-clight w-[33rem] h-[33rem] rounded cshadow">
-                <div className="flex gap-1">
-                    <Link to={homepageRoute} target="_blank" rel="noopener noreferrer">
-                        <img src={AppLogo} className="h-10 w-15 hover:cursor-pointer" />
-                    </Link>
-                    <div className="text-cgreen flex-1 text-left m-auto font-bold text-lg">
-                        <Link to={homepageRoute} target="_blank" rel="noopener noreferrer">
-                            <span className="hover:cursor-pointer">Lorem Ipsum</span>
-                        </Link>
-                    </div>
-                </div>
+            <div className="m-auto p-2 bg-clight w-[600px] h-[580px] rounded cshadow">
                 {currentUser ? (
-                    <div>
+                    <>
+                        <div className="flex gap-1">
+                            <Link to={homepageRoute} target="_blank" rel="noopener noreferrer">
+                                <img src={AppLogo} className="h-10 w-15 hover:cursor-pointer" />
+                            </Link>
+                            <div className="flex-1 text-cgreen text-left m-auto font-bold text-lg">
+                                <Link to={homepageRoute} target="_blank" rel="noopener noreferrer">
+                                    <span className="hover:cursor-pointer">Lorem Ipsum</span>
+                                </Link>
+                            </div>
+                        </div>
                         <div>
                             <div className="flex gap-2">
-                                <div className="flex-1 h-12 w-2/3 p-1 mt-2 bg-clightgreen rounded shadow-lg">
+                                <div className="flex items-center justify-center mt-2 ml-2 text-cblack text-sm font-bold">
+                                    Input:
+                                </div>
+                                <div className="flex-1 h-14 w-2/3 p-1 mt-2 bg-clightgreen rounded shadow-lg">
                                     <div className="flex gap-1 h-full">
                                         {editing ? (
                                             <form
@@ -207,14 +196,12 @@ const App = () => {
                                                     placeholder="Enter to edit"
                                                     onChange={handleChange}
                                                     value={claimEdit}
-                                                    sizing="sm"
                                                 />
                                             </form>
                                         ) : (
-                                            <div className="flex flex-1 h-full text-cblack text-sm font-semibold items-center">
+                                            <div className="flex flex-1 h-full pl-2 text-cblack text-sm font-semibold items-center">
                                                 <span className="line-clamp-2">
-                                                    <span className="underline">Input</span>: "
-                                                    {selectedClaim.current}"
+                                                    {selectedClaim.current}
                                                 </span>
                                             </div>
                                         )}
@@ -234,10 +221,8 @@ const App = () => {
                                 )}
                             </div>
                         </div>
-                        <div className="flex mx-2">
-                            <div className="flex-1 text-sm font-bold text-cblack mt-1">
-                                Why this might be wrong?
-                            </div>
+                        <div className="flex m-2">
+                            <div className="flex-1"></div>
                             <div className="flex gap-3 text-cbrown text-xs justify-center underline mt-1">
                                 {loading ? (
                                     <span className="hover:cursor-not-allowed">Regenerate</span>
@@ -256,7 +241,10 @@ const App = () => {
                                 </Link>
                             </div>
                         </div>
-                        <div className="h-[24rem] w-full overflow-auto p-1 border-2 border-gray-200">
+                        <div className="h-[26.5rem] w-full overflow-auto mt-2 p-1 border-2 border-gray-200">
+                            <div className="flex-1 text-sm text-center font-bold text-cblack mt-1">
+                                Why this might be wrong?
+                            </div>
                             {error ? (
                                 <div className="text-center mt-5 text-red-500">{error}</div>
                             ) : (
@@ -264,7 +252,7 @@ const App = () => {
                             )}
                             <div className="text-cblack">
                                 {loading ? (
-                                    <Spinner className="w-full m-auto mt-24 h-14 fill-cgreen" />
+                                    <Spinner className="w-full mt-16 h-14 fill-cgreen" />
                                 ) : counterarguments.length !== 0 ? (
                                     <div>
                                         {counterarguments.map((counterargument, index) => {
@@ -279,19 +267,17 @@ const App = () => {
                                     </div>
                                 ) : (
                                     !error && (
-                                        <div className="text-center">
+                                        <div className="text-center mt-5">
                                             No Counterarguments Generated
                                         </div>
                                     )
                                 )}
                             </div>
                         </div>
-                    </div>
+                    </>
                 ) : (
-                    <div className="flex flex-col gap-10 text-center w-full py-10 px-5 overflow-hidden">
-                        <img src={BGLogo} className="absolute top-5 left-0 z-0" />
+                    <div className="landing-page flex flex-col gap-10 text-center w-full h-full py-16 px-5 overflow-hidden">
                         <div className="text-4xl text-cgreen font-extrabold z-10">
-                            {getCookie()}
                             Lorem Ipsum Dolor
                         </div>
                         <div className="text-cblack italic z-10">
@@ -326,4 +312,4 @@ const App = () => {
     )
 }
 
-export default App
+export default WindowPopup

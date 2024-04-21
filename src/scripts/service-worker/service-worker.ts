@@ -12,13 +12,29 @@ chrome.runtime.onInstalled.addListener(async () => {
 })
 
 chrome.contextMenus.onClicked.addListener(info => {
-    // chrome.runtime.sendMessage({ command: 'hello-world' })
+    chrome.tabs.create(
+        {
+            url: 'http://localhost:5173/src/index.html?selectedText=' + info.selectionText,
+            active: false
+        },
+        tab => {
+            chrome.windows.create({
+                tabId: tab.id,
+                type: 'popup',
+                focused: true,
+                width: 600,
+                height: 615
+            })
+        }
+    )
+})
+
+chrome.action.setBadgeText({ text: 'ON' })
+
+chrome.action.onClicked.addListener(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        let activeTab = tabs[0]
-        console.log(activeTab)
-        chrome.tabs.sendMessage(activeTab.id, { data: info }, res => {
-            console.log(res)
-        })
+        const activeTab = tabs[0]
+        chrome.tabs.sendMessage(activeTab.id!, { message: 'clicked_browser_action' })
     })
 })
 
@@ -91,14 +107,5 @@ chrome.commands.onCommand.addListener(command => {
         chrome.runtime.reload()
     }
 })
-
-// chrome.action.setBadgeText({ text: 'ON' })
-
-// chrome.action.onClicked.addListener(() => {
-//     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-//         const activeTab = tabs[0]
-//         chrome.tabs.sendMessage(activeTab.id!, { message: 'clicked_browser_action' })
-//     })
-// })
 
 export {}

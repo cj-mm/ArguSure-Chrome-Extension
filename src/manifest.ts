@@ -60,7 +60,7 @@ const createBaseManifest = async (): Promise<Manifest> => {
                 48: './assets/logo.png',
                 128: './assets/logo.png'
             },
-            permissions: ['contextMenus', 'activeTab', 'scripting'],
+            permissions: ['contextMenus', 'activeTab', 'scripting', 'cookies'],
             content_scripts: [
                 {
                     matches: ['<all_urls>'],
