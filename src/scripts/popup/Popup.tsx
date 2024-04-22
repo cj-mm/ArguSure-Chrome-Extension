@@ -9,6 +9,7 @@ import { signInSuccess } from '../../redux/user/userSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import type { RootState } from '../../redux/store'
 import { Link } from 'react-router-dom'
+import PopupLandingPage from './PopupLandingPage'
 
 const App = () => {
     const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
@@ -21,9 +22,9 @@ const App = () => {
     const selectedClaim = useRef('')
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const dispatch = useDispatch()
-    const homepageRoute = 'http://localhost:5174/'
-    const signinRoute = 'http://localhost:5174/sign-in'
-    const signupRoute = 'http://localhost:5174/sign-up'
+    const homepageRoute = 'http://localhost:5173/'
+    const signinRoute = 'http://localhost:5173/sign-in'
+    const signupRoute = 'http://localhost:5173/sign-up'
 
     useEffect(() => {
         const onMount = async () => {
@@ -43,13 +44,10 @@ const App = () => {
 
     const getCurrentUser = async () => {
         try {
-            const res = await fetch(
-                `http://localhost:5000/api/user/getuser?cookie=${getCookie()}`,
-                {
-                    method: 'GET',
-                    mode: 'cors'
-                }
-            )
+            const res = await fetch(`http://localhost:5000/api/user/getuser`, {
+                method: 'GET',
+                mode: 'cors'
+            })
             const data = await res.json()
             console.log('WAHAHAHAHHA HAHAH')
             console.log(data)
@@ -168,25 +166,15 @@ const App = () => {
         }
     }
 
-    const getCookie = () => {
-        const value = `; ${document.cookie}`
-        const parts = value.split(`; access_token=`)
-        if (parts.length === 2) return parts.pop().split(';').shift()
-    }
+    // const getCookie = () => {
+    //     const value = `; ${document.cookie}`
+    //     const parts = value.split(`; access_token=`)
+    //     if (parts.length === 2) return parts.pop().split(';').shift()
+    // }
 
     return (
-        <div className="flex w-screen h-screen">
-            <div className="m-auto p-2 bg-clight w-[33rem] h-[33rem] rounded cshadow">
-                <div className="flex gap-1">
-                    <Link to={homepageRoute} target="_blank" rel="noopener noreferrer">
-                        <img src={AppLogo} className="h-10 w-15 hover:cursor-pointer" />
-                    </Link>
-                    <div className="text-cgreen flex-1 text-left m-auto font-bold text-lg">
-                        <Link to={homepageRoute} target="_blank" rel="noopener noreferrer">
-                            <span className="hover:cursor-pointer">Lorem Ipsum</span>
-                        </Link>
-                    </div>
-                </div>
+        <div className="flex w-full h-full">
+            <div className="m-auto p-2 bg-clight w-full h-full rounded cshadow">
                 {currentUser ? (
                     <div>
                         <div>
@@ -288,38 +276,7 @@ const App = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-10 text-center w-full py-10 px-5 overflow-hidden">
-                        <img src={BGLogo} className="absolute top-5 left-0 z-0" />
-                        <div className="text-4xl text-cgreen font-extrabold z-10">
-                            {getCookie()}
-                            Lorem Ipsum Dolor
-                        </div>
-                        <div className="text-cblack italic z-10">
-                            ..... Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                            sodales velit vulputate magna euismod, vel maximus quam aliquam. Nulla
-                            eu sem vitae metus fringilla fermentum. Integer ante tortor, dictum a
-                            augue eget, efficitur tristique tellus. Quisque pretium feugiat blandit.
-                            Nam scelerisque rutrum dolor eget finibus. Vivamus nec nisl ultrices,
-                            auctor ante vitae, lacinia lorem. Aenean ullamcorper tristique
-                            ullamcorper. Vestibulum finibus erat nibh, nec mollis nisl eleifend non
-                            .....
-                        </div>
-                        <div className="gap-3 z-10  w-full justify-center text-cblack font-bold">
-                            Need to{' '}
-                            <Link to={signinRoute} target="_blank" rel="noopener noreferrer">
-                                <span className="text-cbrown underline hover:cursor-pointer">
-                                    Sign in
-                                </span>
-                            </Link>{' '}
-                            or{' '}
-                            <Link to={signupRoute} target="_blank" rel="noopener noreferrer">
-                                <span className="text-cbrown underline hover:cursor-pointer">
-                                    Sign up
-                                </span>
-                            </Link>{' '}
-                            first
-                        </div>
-                    </div>
+                    <PopupLandingPage />
                 )}
             </div>
         </div>
