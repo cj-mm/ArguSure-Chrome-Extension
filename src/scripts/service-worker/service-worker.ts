@@ -1,6 +1,7 @@
 import { handleRecord, fetchUser, fetchHandleLike, fetchHandleSave } from './api-req-handler'
-
 console.log('Background Service Worker Loaded')
+const windowPopupRoute = 'http://localhost:5173/window-popup?selectedText='
+
 chrome.runtime.onInstalled.addListener(async () => {
     console.log('Extension installed')
     chrome.contextMenus.create({
@@ -14,7 +15,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 chrome.contextMenus.onClicked.addListener(info => {
     chrome.tabs.create(
         {
-            url: 'http://localhost:5173/src/index.html?selectedText=' + info.selectionText,
+            url: windowPopupRoute + info.selectionText,
             active: false
         },
         tab => {
@@ -22,8 +23,8 @@ chrome.contextMenus.onClicked.addListener(info => {
                 tabId: tab.id,
                 type: 'popup',
                 focused: true,
-                width: 600,
-                height: 615
+                width: 610,
+                height: 620
             })
         }
     )
