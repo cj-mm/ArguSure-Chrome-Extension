@@ -42,7 +42,6 @@ const App = () => {
                 setError(data.message)
                 dispatch(signInSuccess(null))
             } else {
-                console.log(data)
                 setError(null)
                 dispatch(signInSuccess(data))
             }

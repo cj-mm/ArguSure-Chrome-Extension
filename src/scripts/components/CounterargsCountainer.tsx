@@ -14,7 +14,7 @@ import {
     setUnsaveDataBody
 } from '../../redux/counterargument/counterargSlice'
 import type { RootState } from '../../redux/store'
-// import UnsaveModal from './UnsaveModal'
+import UnsaveModal from './UnsaveModal'
 // import SaveTo from './SaveTo'
 
 export default function CounterargsContainer({ counterargument, withClaim }) {
@@ -93,21 +93,21 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
     }
 
     const handleUnsave = async () => {
-        // let savedTo = []
-        // for (let i = 0; i < currentUser.saved.length; i++) {
-        //     const topic = currentUser.saved[i]
-        //     if (topic.counterarguments.includes(counterargument._id)) {
-        //         savedTo.push(topic.topicName)
-        //     }
-        // }
-        // const dataBody = {
-        //     userId: currentUser._id,
-        //     counterargId: counterargument._id,
-        //     savedTo: savedTo,
-        //     removeFrom: savedTo
-        // }
-        // dispatch(setUnsaveDataBody(dataBody))
-        // dispatch(showUnsaveModal())
+        let savedTo = []
+        for (let i = 0; i < currentUser.saved.length; i++) {
+            const topic = currentUser.saved[i]
+            if (topic.counterarguments.includes(counterargument._id)) {
+                savedTo.push(topic.topicName)
+            }
+        }
+        const dataBody = {
+            userId: currentUser._id,
+            counterargId: counterargument._id,
+            savedTo: savedTo,
+            removeFrom: savedTo
+        }
+        dispatch(setUnsaveDataBody(dataBody))
+        dispatch(showUnsaveModal())
     }
 
     return (
@@ -118,9 +118,8 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
                 </div>
             )}
             <div className={'flex gap-3 p-2 ' + (readMore ? 'h-full' : 'h-32')}>
-                <div className="flex flex-col gap-0 text-justify max-w-[50rem]">
+                <div className="flex flex-col gap-0 text-justify max-w-[425px] break-normal">
                     <div className="overflow-hidden">
-                        {/* text-[0.80rem] */}
                         <div className="font-semibold text-sm">{summary}</div>
                         <div className=" mt-2 text-sm">
                             <div>{body}</div>
@@ -210,7 +209,7 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
                 </div>
             </div>
             {/* <SaveTo /> */}
-            {/* <UnsaveModal /> */}
+            <UnsaveModal />
         </div>
     )
 }
