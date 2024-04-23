@@ -25,18 +25,16 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
     const source = counterargument.source
     const [readMore, setReadMore] = useState(false)
     const [liked, setLiked] = useState(counterargument.liked)
-    // const { currentUser } = useSelector(state => state.user)
-    // const { savedCounterargs } = useSelector(state => state.counterarg)
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const savedCounterargs = useSelector((state: RootState) => state.counterarg.savedCounterargs)
     const dispatch = useDispatch()
     const backendServerRoute = 'http://localhost:5000'
 
-    const getCookie = () => {
-        const value = `; ${document.cookie}`
-        const parts = value.split(`; access_token=`)
-        if (parts.length === 2) return parts.pop().split(';').shift()
-    }
+    // const getCookie = () => {
+    //     const value = `; ${document.cookie}`
+    //     const parts = value.split(`; access_token=`)
+    //     if (parts.length === 2) return parts.pop().split(';').shift()
+    // }
 
     const handleRead = () => {
         setReadMore(!readMore)
@@ -49,14 +47,11 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
             liked: action
         }
         try {
-            const res = await fetch(
-                `${backendServerRoute}/api/counterarg/like?cookie=${getCookie()}`,
-                {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dataBody)
-                }
-            )
+            const res = await fetch('/api/counterarg/like', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataBody)
+            })
             const data = await res.json()
 
             if (!res.ok) {
