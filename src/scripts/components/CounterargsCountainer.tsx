@@ -65,25 +65,31 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
     }
 
     const handleSave = async () => {
-        // const dataBody = {
-        //     userId: currentUser._id,
-        //     counterargId: counterargument._id,
-        //     selectedTopics: ['default']
-        // }
-        // try {
-        //     const res = await chrome.runtime.sendMessage({
-        //         command: 'handle-save',
-        //         body: dataBody
-        //     })
-        //     if (res.success === false) {
-        //         console.log(res.data)
-        //     } else {
-        //         dispatch(addToSavedCounterargs(counterargument._id))
-        //         dispatch(updateSuccess(res.data.userWithUpdatedSaved))
-        //     }
-        // } catch (error) {
-        //     console.log(error.message)
-        // }
+        const dataBody = {
+            userId: currentUser._id,
+            counterargId: counterargument._id,
+            selectedTopics: ['default']
+        }
+        try {
+            const res = await fetch('/api/saved/save', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataBody)
+            })
+            const data = await res.json()
+
+            if (!res.ok) {
+                console.log(data.message)
+            } else {
+                console.log(savedCounterargs)
+                dispatch(addToSavedCounterargs(counterargument._id))
+                dispatch(updateSuccess(data.userWithUpdatedSaved))
+                console.log(savedCounterargs)
+                console.log(counterargument._id)
+            }
+        } catch (error) {
+            console.log(error.message)
+        }
     }
 
     const handleUnsave = async () => {

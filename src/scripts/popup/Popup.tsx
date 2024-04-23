@@ -233,10 +233,7 @@ const App = () => {
                                     </div>
                                 </>
                             ) : (
-                                <div className="flex flex-col gap-10 m-auto text-center my-10">
-                                    {/* <div className="text-4xl text-cgreen font-extrabold">
-                                        Lorem Ipsum Dolor
-                                    </div> */}
+                                <div className="flex flex-col gap-2 m-auto text-center my-1">
                                     <div className="text-cblack text-base italic p-5">
                                         ..... Lorem ipsum dolor sit amet, consectetur adipiscing
                                         elit. Sed sodales velit vulputate magna euismod, vel maximus
