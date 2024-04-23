@@ -15,7 +15,7 @@ import {
 } from '../../redux/counterargument/counterargSlice'
 import type { RootState } from '../../redux/store'
 import UnsaveModal from './UnsaveModal'
-// import SaveTo from './SaveTo'
+import SaveTo from './SaveTo'
 
 export default function CounterargsContainer({ counterargument, withClaim }) {
     const claim =
@@ -208,7 +208,7 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
                     </div>
                 </div>
             </div>
-            {/* <SaveTo /> */}
+            <SaveTo />
             <UnsaveModal />
         </div>
     )
