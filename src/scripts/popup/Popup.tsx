@@ -1,125 +1,98 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { Spinner, TextInput } from 'flowbite-react'
-import { MdOutlineDriveFileRenameOutline } from 'react-icons/md'
+import { Button, Spinner, Textarea } from 'flowbite-react'
 import AppLogo from '../../assets/logo.png'
-import BGLogo from '../../assets/bg-logo.png'
 import CounterargsContainer from '../components/CounterargsCountainer'
-import { signInSuccess } from '../../redux/user/userSlice'
-import { useDispatch, useSelector } from 'react-redux'
+import PopupLandingPage from './PopupLandingPage'
+import SkeletonLoader from '../components/SkeletonLoader'
 import type { RootState } from '../../redux/store'
 import { Link } from 'react-router-dom'
-import PopupLandingPage from './PopupLandingPage'
+import { useDispatch, useSelector } from 'react-redux'
+import { signInSuccess } from '@/redux/user/userSlice'
 
 const App = () => {
     const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
+    const [inputClaim, setInputClaim] = useState('')
     const [counterarguments, setCounterarguments] = useState([])
-    const [claimEdit, setClaimEdit] = useState('')
-    const [editing, setEditing] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
-    const selectedClaim = useRef('')
+    const currentInput = useRef('')
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const dispatch = useDispatch()
     const homepageRoute = 'http://localhost:5173/'
-    const signinRoute = 'http://localhost:5173/sign-in'
-    const signupRoute = 'http://localhost:5173/sign-up'
+    const profilepageRoute = 'http://localhost:5173/profile'
+    const backendServerRoute = 'http://localhost:5000'
 
     useEffect(() => {
         const onMount = async () => {
             await getCurrentUser() // get signed in user
-            if (currentUser) {
-                setClaimEdit(selectedClaim.current)
-                // generateCounterarguments()
-            }
         }
         onMount()
     }, [])
 
-    const handleChange = e => {
-        setClaimEdit(e.target.value)
-        selectedClaim.current = e.target.value
-    }
-
     const getCurrentUser = async () => {
         try {
-            const res = await fetch(`http://localhost:5000/api/user/getuser`, {
+            const res = await fetch(`/api/user/getuser`, {
                 method: 'GET',
                 mode: 'cors'
             })
             const data = await res.json()
-            console.log('WAHAHAHAHHA HAHAH')
-            console.log(data)
             if (!res.ok) {
-                console.log('WAHAHAHAHHA FAILED')
-                console.log(data.message)
+                setError(data.message)
                 dispatch(signInSuccess(null))
-                // return false
             } else {
-                console.log('WAHAHAHAHHA SUCCESS')
                 console.log(data)
                 setError(null)
                 dispatch(signInSuccess(data))
-                // return data
-            }
-        } catch (error) {
-            console.log(error.message)
-            return false
-        }
-    }
-
-    const handleRecord = async (claim, summary, body, source) => {
-        const counterargData = { inputClaim: claim, summary, body, source }
-        try {
-            const res = await chrome.runtime.sendMessage({
-                command: 'record-counterargs',
-                body: counterargData
-            })
-            if (res.success === false) {
-                setError(res.data)
-            } else {
-                setError(null)
-                return res.data
             }
         } catch (error) {
             setError(error.message)
         }
     }
 
+    const handleChange = e => {
+        setInputClaim(e.target.value)
+    }
+
+    const handleRecord = async (claim, summary, body, source) => {
+        const counterargData = { inputClaim: claim, summary, body, source }
+        try {
+            const res = await fetch('/api/counterarg/record', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(counterargData)
+            })
+            const data = await res.json()
+            if (!res.ok) {
+                setError(data.message)
+            } else {
+                setError(null)
+                return data
+            }
+        } catch (error) {
+            setError('Something went wrong')
+        }
+    }
+
     const generateCounterarguments = async () => {
         try {
-            ////
-            selectedClaim.current = 'self driving cars'
-            ////
-            if (!selectedClaim.current) {
-                setError('Please select something!')
+            if (!inputClaim) {
+                setError('Please input something!')
                 setLoading(false)
                 setCounterarguments([])
                 return
             }
-            // currentInput.current = inputClaim
+            currentInput.current = inputClaim
             setError(null)
             setLoading(true)
             const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
-
             const chat = model.startChat({
-                // history: [
-                //   {
-                //     role: "user",
-                //     parts: "Hello!",
-                //   },
-                //   {
-                //     role: "model",
-                //     parts: "Great to meet you. What would you like to know?",
-                //   },
-                // ],
                 generationConfig: {
                     maxOutputTokens: 4096
                 }
             })
-
-            const claim = `'${selectedClaim.current}'`
+            const claim = `'${inputClaim}'`
             const msgs = [
                 'Provide one argument against ' +
                     claim +
@@ -144,7 +117,8 @@ const App = () => {
                 const counterarg = { summary, body, source }
                 counterargs.push(counterarg)
             }
-
+            setLoading(false)
+            setError(null)
             for (let i = 0; i < counterargs.length; i++) {
                 const counterarg = counterargs[i]
                 const data = await handleRecord(
@@ -156,8 +130,6 @@ const App = () => {
                 counterargs[i] = data
             }
             setCounterarguments(counterargs)
-            setLoading(false)
-            setError(null)
         } catch (error) {
             setLoading(false)
             setCounterarguments([])
@@ -166,95 +138,89 @@ const App = () => {
         }
     }
 
-    // const getCookie = () => {
-    //     const value = `; ${document.cookie}`
-    //     const parts = value.split(`; access_token=`)
-    //     if (parts.length === 2) return parts.pop().split(';').shift()
-    // }
-
     return (
         <div className="flex w-full h-full">
-            <div className="m-auto p-2 bg-clight w-full h-full rounded cshadow">
-                {currentUser ? (
-                    <div>
-                        <div>
-                            <div className="flex gap-2">
-                                <div className="flex-1 h-12 w-2/3 p-1 mt-2 bg-clightgreen rounded shadow-lg">
-                                    <div className="flex gap-1 h-full">
-                                        {editing ? (
-                                            <form
-                                                className="flex-1 mt-1"
-                                                onSubmit={e => {
-                                                    e.preventDefault()
-                                                    setEditing(false)
-                                                    generateCounterarguments()
-                                                }}
-                                            >
-                                                <TextInput
-                                                    type="text"
-                                                    placeholder="Enter to edit"
-                                                    onChange={handleChange}
-                                                    value={claimEdit}
-                                                    sizing="sm"
-                                                />
-                                            </form>
-                                        ) : (
-                                            <div className="flex flex-1 h-full text-cblack text-sm font-semibold items-center">
-                                                <span className="line-clamp-2">
-                                                    <span className="underline">Input</span>: "
-                                                    {selectedClaim.current}"
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                {loading ? (
-                                    <span className="text-cbrown m-auto hover:cursor-not-allowed">
-                                        <MdOutlineDriveFileRenameOutline size={20} />
-                                    </span>
-                                ) : (
-                                    <span
-                                        className="text-cbrown m-auto hover:cursor-pointer hover:text-yellow-800"
-                                        onClick={() => setEditing(!editing)}
-                                    >
-                                        <MdOutlineDriveFileRenameOutline size={20} />
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                        <div className="flex mx-2">
-                            <div className="flex-1 text-sm font-bold text-cblack mt-1">
-                                Why this might be wrong?
-                            </div>
-                            <div className="flex gap-3 text-cbrown text-xs justify-center underline mt-1">
-                                {loading ? (
-                                    <span className="hover:cursor-not-allowed">Regenerate</span>
-                                ) : (
-                                    <span
-                                        className="hover:cursor-pointer hover:text-yellow-800"
-                                        onClick={() => generateCounterarguments()}
-                                    >
-                                        Regenerate
-                                    </span>
-                                )}
+            <div className="popup-container m-auto p-2 bg-clight w-full h-full rounded cshadow">
+                {true ? (
+                    <div className="w-full h-full">
+                        <div className="flex gap-1 m-3">
+                            <div className="flex-1"></div>
+                            <div className="text-cgreen text-left m-auto font-extrabold text-xl">
                                 <Link to={homepageRoute} target="_blank" rel="noopener noreferrer">
-                                    <span className="hover:cursor-pointer hover:text-yellow-800">
-                                        Go to homepage
-                                    </span>
+                                    <span className="hover:cursor-pointer">Lorem Ipsum</span>
                                 </Link>
                             </div>
+                            <div className="flex-1"></div>
                         </div>
-                        <div className="h-[24rem] w-full overflow-auto p-1 border-2 border-gray-200">
-                            {error ? (
-                                <div className="text-center mt-5 text-red-500">{error}</div>
-                            ) : (
-                                <></>
-                            )}
-                            <div className="text-cblack">
+                        <div className="home-input flex gap-1 justify-center">
+                            <Link
+                                to={profilepageRoute}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="my-auto w-16"
+                            >
+                                <img
+                                    src={currentUser.profilePicture}
+                                    className="h-12 rounded-full  hover:cursor-pointer"
+                                ></img>
+                            </Link>
+
+                            <textarea
+                                placeholder="Enter a claim or an argument"
+                                className="w-96 max-h-16 min-h-16 rounded"
+                                id="inputclaim-area"
+                                onChange={handleChange}
+                            />
+                            <Button
+                                className="bg-cbrown text-clight font-semibold w-44 h-10 mt-2 hover:shadow-lg enabled:hover:bg-yellow-900 "
+                                type="button"
+                                onClick={generateCounterarguments}
+                                disabled={inputClaim && !loading ? false : true}
+                            >
                                 {loading ? (
-                                    <Spinner className="w-full m-auto mt-24 h-14 fill-cgreen" />
-                                ) : counterarguments.length !== 0 ? (
-                                    <div>
+                                    <>
+                                        <Spinner size="sm" />
+                                        <span className="ml-1">Generating...</span>
+                                    </>
+                                ) : (
+                                    'Generate'
+                                )}
+                            </Button>
+                        </div>
+                        {error ? (
+                            <div className="text-center mt-5 text-red-500">{error}</div>
+                        ) : (
+                            <></>
+                        )}
+                        <div>
+                            {loading ? (
+                                <Spinner className="w-full mt-16 h-14 fill-cgreen" />
+                            ) : counterarguments.length !== 0 ? (
+                                <>
+                                    <div className="flex mt-2">
+                                        <div className="flex-1"></div>
+                                        <div className="flex gap-3 text-cbrown text-sm justify-center underline mt-1">
+                                            <span
+                                                className="hover:cursor-pointer hover:text-yellow-800"
+                                                onClick={() => generateCounterarguments()}
+                                            >
+                                                Regenerate
+                                            </span>
+                                            <Link
+                                                to={homepageRoute}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <span className="hover:cursor-pointer hover:text-yellow-800">
+                                                    Go to homepage
+                                                </span>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                    <div className="h-[380px] mt-1 p-2 overflow-y-auto border-2 border-gray-300 rounded">
+                                        <div className="w-full text-center text-sm font-bold text-cblack">
+                                            Why this might be wrong?
+                                        </div>
                                         {counterarguments.map((counterargument, index) => {
                                             return (
                                                 <CounterargsContainer
@@ -265,15 +231,37 @@ const App = () => {
                                             )
                                         })}
                                     </div>
-                                ) : (
-                                    !error && (
-                                        <div className="text-center">
-                                            No Counterarguments Generated
-                                        </div>
-                                    )
-                                )}
-                            </div>
+                                </>
+                            ) : (
+                                <div className="flex flex-col gap-10 m-auto text-center my-10">
+                                    {/* <div className="text-4xl text-cgreen font-extrabold">
+                                        Lorem Ipsum Dolor
+                                    </div> */}
+                                    <div className="text-cblack text-base italic p-5">
+                                        ..... Lorem ipsum dolor sit amet, consectetur adipiscing
+                                        elit. Sed sodales velit vulputate magna euismod, vel maximus
+                                        quam aliquam. Nulla eu sem vitae metus fringilla fermentum.
+                                        Integer ante tortor, dictum a augue eget, efficitur
+                                        tristique tellus. Quisque pretium feugiat blandit. Nam
+                                        scelerisque rutrum dolor eget finibus. Vivamus nec nisl
+                                        ultrices, auctor ante vitae, lacinia lorem. Aenean
+                                        ullamcorper tristique ullamcorper. Vestibulum finibus erat
+                                        nibh, nec mollis nisl eleifend non .....
+                                    </div>
+                                    <div>
+                                        <Link
+                                            to={homepageRoute}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-cbrown text-sm underline w-fit text-center hover:cursor-pointer"
+                                        >
+                                            Go to homepage
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
                         </div>
+                        <div></div>
                     </div>
                 ) : (
                     <PopupLandingPage />

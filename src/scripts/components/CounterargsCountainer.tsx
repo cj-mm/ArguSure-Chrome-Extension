@@ -120,7 +120,7 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
                 <div className="flex flex-col gap-0 text-justify max-w-[50rem]">
                     <div className="overflow-hidden">
                         {/* text-[0.80rem] */}
-                        <div className="font-semibold text-sm italic">{summary}</div>
+                        <div className="font-semibold text-sm">{summary}</div>
                         <div className=" mt-2 text-sm">
                             <div>{body}</div>
                             <div className="mt-2">
@@ -185,7 +185,7 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
                     <div className="flex gap-2 mt-5">
                         {liked !== 'liked' ? (
                             <BiLike
-                                className="size-5 hover:cursor-pointer hover:text-cbrown"
+                                className="size-4 hover:cursor-pointer hover:text-cbrown"
                                 onClick={() => handleLike('liked')}
                             />
                         ) : (

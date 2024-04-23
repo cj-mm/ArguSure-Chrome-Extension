@@ -13,9 +13,14 @@ body {
     background-position: 25%;
     background-size: 50em;
     background-attachment: fixed; */
-    width: 100vw;
-    height: 100vh;
+    width: 550px;
+    height: 550px;
     overflow: hidden;
+}
+
+#popup-root {
+    width: 550px;
+    height: 550px;
 }
 
 .cshadow {
@@ -54,10 +59,14 @@ body {
     background-color: rgba(17, 24, 39, 0.3);
 }
 
-.landing-page {
+.popup-container {
     background-image: url('../assets/bg-logo.png');
     background-repeat: no-repeat;
-    background-position-x: left;
-    background-size: 30em;
+    background-position-y: center;
+    background-size: 500px;
     background-attachment: relative;
+}
+
+textarea {
+    resize: none;
 }
