@@ -10,7 +10,7 @@ import {
     addToSavedCounterargs
 } from '../../redux/counterargument/counterargSlice'
 import type { RootState } from '../../redux/store'
-// import AddTopic from './AddTopic'
+import AddTopic from './AddTopic'
 
 export default function SaveTo() {
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
@@ -188,7 +188,7 @@ export default function SaveTo() {
                             )}
                         </div>
                     </div>
-                    {/* <AddTopic /> */}
+                    <AddTopic />
                 </Modal.Body>
             </Modal>
         )
