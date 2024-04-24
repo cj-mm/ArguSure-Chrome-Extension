@@ -7,7 +7,10 @@ import {
     hideSaveToModal,
     showAddTopic,
     hideAddTopic,
-    addToSavedCounterargs
+    addToSavedCounterargs,
+    setPromptText,
+    showPrompt,
+    hidePrompt
 } from '../../redux/counterargument/counterargSlice'
 import type { RootState } from '../../redux/store'
 import AddTopic from './AddTopic'
@@ -22,6 +25,7 @@ export default function SaveTo() {
     const [checkedTopics, setCheckedTopics] = useState([])
     const dispatch = useDispatch()
     const counterargument = selectedCounterarg
+    const delay = ms => new Promise(res => setTimeout(res, ms))
 
     useEffect(() => {
         if (counterargument) {
@@ -88,6 +92,10 @@ export default function SaveTo() {
                 dispatch(updateSuccess(data.userWithUpdatedSaved))
                 setCheckedTopics([])
                 dispatch(hideSaveToModal())
+                dispatch(setPromptText('SAVED'))
+                dispatch(showPrompt())
+                await delay(2000)
+                dispatch(hidePrompt())
             }
         } catch (error) {
             console.log(error.message)

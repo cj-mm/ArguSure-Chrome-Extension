@@ -6,7 +6,10 @@ import { updateSuccess } from '../../redux/user/userSlice'
 import {
     hideUnsaveModal,
     removeFromSavedCounterargs,
-    setUnsaveDataBody
+    setUnsaveDataBody,
+    setPromptText,
+    showPrompt,
+    hidePrompt
 } from '../../redux/counterargument/counterargSlice'
 import type { RootState } from '../../redux/store'
 
@@ -15,6 +18,7 @@ export default function UnsaveModal() {
     const unsaveModal = useSelector((state: RootState) => state.counterarg.unsaveModal)
     const unsaveDataBody = useSelector((state: RootState) => state.counterarg.unsaveDataBody)
     const dispatch = useDispatch()
+    const delay = ms => new Promise(res => setTimeout(res, ms))
 
     const handleUnsave = async () => {
         try {
@@ -36,6 +40,10 @@ export default function UnsaveModal() {
         }
         dispatch(setUnsaveDataBody({}))
         dispatch(hideUnsaveModal())
+        dispatch(setPromptText('UNSAVED'))
+        dispatch(showPrompt())
+        await delay(2000)
+        dispatch(hidePrompt())
     }
 
     return (

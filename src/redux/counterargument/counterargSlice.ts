@@ -8,6 +8,8 @@ export interface CounterargState {
     unsaveModal: boolean
     unsaveDataBody: any
     addTopic: boolean
+    prompt: boolean
+    promptText: String
 }
 
 const initialState: CounterargState = {
@@ -16,7 +18,9 @@ const initialState: CounterargState = {
     savedCounterargs: [],
     unsaveModal: false,
     unsaveDataBody: {},
-    addTopic: false
+    addTopic: false,
+    prompt: false,
+    promptText: ''
 }
 
 const counterargSlice = createSlice({
@@ -66,6 +70,15 @@ const counterargSlice = createSlice({
         },
         hideAddTopic: state => {
             state.addTopic = false
+        },
+        setPromptText: (state, action: PayloadAction<String>) => {
+            state.promptText = action.payload
+        },
+        showPrompt: state => {
+            state.prompt = true
+        },
+        hidePrompt: state => {
+            state.prompt = false
         }
     }
 })
@@ -81,7 +94,10 @@ export const {
     hideUnsaveModal,
     setUnsaveDataBody,
     showAddTopic,
-    hideAddTopic
+    hideAddTopic,
+    setPromptText,
+    showPrompt,
+    hidePrompt
 } = counterargSlice.actions
 
 export default counterargSlice.reducer

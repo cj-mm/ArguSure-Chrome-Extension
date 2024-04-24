@@ -11,7 +11,10 @@ import {
     setSelectedCounterarg,
     addToSavedCounterargs,
     showUnsaveModal,
-    setUnsaveDataBody
+    setUnsaveDataBody,
+    setPromptText,
+    showPrompt,
+    hidePrompt
 } from '../../redux/counterargument/counterargSlice'
 import type { RootState } from '../../redux/store'
 import UnsaveModal from './UnsaveModal'
@@ -28,6 +31,7 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const savedCounterargs = useSelector((state: RootState) => state.counterarg.savedCounterargs)
     const dispatch = useDispatch()
+    const delay = ms => new Promise(res => setTimeout(res, ms))
     const backendServerRoute = 'http://localhost:5000'
 
     // const getCookie = () => {
@@ -84,8 +88,10 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
                 console.log(savedCounterargs)
                 dispatch(addToSavedCounterargs(counterargument._id))
                 dispatch(updateSuccess(data.userWithUpdatedSaved))
-                console.log(savedCounterargs)
-                console.log(counterargument._id)
+                dispatch(setPromptText('SAVED'))
+                dispatch(showPrompt())
+                await delay(2000)
+                dispatch(hidePrompt())
             }
         } catch (error) {
             console.log(error.message)

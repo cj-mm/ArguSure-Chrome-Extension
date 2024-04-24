@@ -9,6 +9,7 @@ import type { RootState } from '../../redux/store'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { signInSuccess } from '@/redux/user/userSlice'
+import Prompt from '../components/Prompt'
 
 const App = () => {
     const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
@@ -19,6 +20,8 @@ const App = () => {
     const [error, setError] = useState(null)
     const currentInput = useRef('')
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
+    const prompt = useSelector((state: RootState) => state.counterarg.prompt)
+    const promptText = useSelector((state: RootState) => state.counterarg.promptText)
     const dispatch = useDispatch()
     const charLimit = 500
     const homepageRoute = 'http://localhost:5173/'
@@ -283,11 +286,11 @@ const App = () => {
                                 </div>
                             )}
                         </div>
-                        <div></div>
                     </div>
                 ) : (
                     <PopupLandingPage />
                 )}
+                {prompt && promptText && <Prompt promptText={promptText} />}
             </div>
         </div>
     )
