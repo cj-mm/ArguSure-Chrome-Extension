@@ -118,7 +118,7 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
                 </div>
             )}
             <div className={'flex gap-3 p-2 ' + (readMore ? 'h-full' : 'h-32')}>
-                <div className="flex flex-col gap-0 text-justify max-w-[425px] break-normal">
+                <div className="flex flex-col gap-0 text-justify max-w-[430px] break-normal">
                     <div className="overflow-hidden">
                         <div className="font-semibold text-sm">{summary}</div>
                         <div className=" mt-2 text-sm">
@@ -187,22 +187,26 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
                             <BiLike
                                 className="size-4 hover:cursor-pointer hover:text-cbrown"
                                 onClick={() => handleLike('liked')}
+                                size={20}
                             />
                         ) : (
                             <BiSolidLike
                                 className="size-4 text-cbrown hover:cursor-pointer"
                                 onClick={() => handleLike('none')}
+                                size={20}
                             />
                         )}
                         {liked !== 'disliked' ? (
                             <BiDislike
                                 className="size-4 hover:cursor-pointer hover:text-cbrown"
                                 onClick={() => handleLike('disliked')}
+                                size={20}
                             />
                         ) : (
                             <BiSolidDislike
                                 className="size-4 text-cbrown hover:cursor-pointer"
                                 onClick={() => handleLike('none')}
+                                size={20}
                             />
                         )}
                     </div>
