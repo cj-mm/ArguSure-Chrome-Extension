@@ -8,6 +8,7 @@ import { useLocation } from 'react-router-dom'
 import type { RootState } from '../../redux/store'
 
 export default function AddTopic() {
+    const backendServerRoute = 'http://localhost:5000'
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const addTopic = useSelector((state: RootState) => state.counterarg.addTopic)
     const [inputTopic, setInputTopic] = useState('')
@@ -25,7 +26,7 @@ export default function AddTopic() {
             topicName: inputTopic
         }
         try {
-            const res = await fetch('/api/saved/addtopic', {
+            const res = await fetch(backendServerRoute + '/api/saved/addtopic', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dataBody)

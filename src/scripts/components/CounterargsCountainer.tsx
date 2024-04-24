@@ -21,6 +21,7 @@ import UnsaveModal from './UnsaveModal'
 import SaveTo from './SaveTo'
 
 export default function CounterargsContainer({ counterargument, withClaim }) {
+    const backendServerRoute = 'http://localhost:5000'
     const claim =
         counterargument.inputClaim.charAt(0).toUpperCase() + counterargument.inputClaim.slice(1)
     const summary = counterargument.summary
@@ -32,7 +33,6 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
     const savedCounterargs = useSelector((state: RootState) => state.counterarg.savedCounterargs)
     const dispatch = useDispatch()
     const delay = ms => new Promise(res => setTimeout(res, ms))
-    const backendServerRoute = 'http://localhost:5000'
 
     // const getCookie = () => {
     //     const value = `; ${document.cookie}`
@@ -51,7 +51,7 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
             liked: action
         }
         try {
-            const res = await fetch('/api/counterarg/like', {
+            const res = await fetch(backendServerRoute + '/api/counterarg/like', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dataBody)
@@ -75,7 +75,7 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
             selectedTopics: ['default']
         }
         try {
-            const res = await fetch('/api/saved/save', {
+            const res = await fetch(backendServerRoute + '/api/saved/save', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dataBody)

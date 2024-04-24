@@ -16,6 +16,7 @@ import type { RootState } from '../../redux/store'
 import AddTopic from './AddTopic'
 
 export default function SaveTo() {
+    const backendServerRoute = 'http://localhost:5000'
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const saveToModal = useSelector((state: RootState) => state.counterarg.saveToModal)
     const addTopic = useSelector((state: RootState) => state.counterarg.addTopic)
@@ -31,7 +32,7 @@ export default function SaveTo() {
         if (counterargument) {
             const getCurrentUser = async () => {
                 try {
-                    const res = await fetch(`/api/user/getuser`, {
+                    const res = await fetch(backendServerRoute + `/api/user/getuser`, {
                         method: 'GET'
                     })
                     const data = await res.json()
@@ -79,7 +80,7 @@ export default function SaveTo() {
         }
         console.log(dataBody.selectedTopics)
         try {
-            const res = await fetch('/api/saved/save', {
+            const res = await fetch(backendServerRoute + '/api/saved/save', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dataBody)

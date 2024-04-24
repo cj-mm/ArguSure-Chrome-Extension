@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { Button, Spinner, Textarea } from 'flowbite-react'
-import AppLogo from '../../assets/logo.png'
 import CounterargsContainer from '../components/CounterargsCountainer'
 import PopupLandingPage from './PopupLandingPage'
-import SkeletonLoader from '../components/SkeletonLoader'
 import type { RootState } from '../../redux/store'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -12,6 +10,7 @@ import { signInSuccess } from '@/redux/user/userSlice'
 import Prompt from '../components/Prompt'
 
 const App = () => {
+    const backendServerRoute = 'http://localhost:5000'
     const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
     const [inputClaim, setInputClaim] = useState('')
@@ -26,7 +25,6 @@ const App = () => {
     const charLimit = 500
     const homepageRoute = 'http://localhost:5173/'
     const profilepageRoute = 'http://localhost:5173/profile'
-    const backendServerRoute = 'http://localhost:5000'
 
     useEffect(() => {
         const onMount = async () => {
@@ -37,7 +35,8 @@ const App = () => {
 
     const getCurrentUser = async () => {
         try {
-            const res = await fetch(`/api/user/getuser`, {
+            // remove backendServerRoute if in development mode
+            const res = await fetch(backendServerRoute + `/api/user/getuser`, {
                 method: 'GET',
                 mode: 'cors'
             })
@@ -61,7 +60,7 @@ const App = () => {
     const handleRecord = async (claim, summary, body, source) => {
         const counterargData = { inputClaim: claim, summary, body, source }
         try {
-            const res = await fetch('/api/counterarg/record', {
+            const res = await fetch(backendServerRoute + '/api/counterarg/record', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(counterargData)
@@ -168,7 +167,7 @@ const App = () => {
     return (
         <div className="flex w-full h-full">
             <div className="popup-container m-auto p-2 bg-clight w-full h-full rounded cshadow">
-                {true ? (
+                {currentUser ? ( // make this true if developing
                     <div className="w-full h-full">
                         <div className="flex gap-1 m-3">
                             <div className="flex-1"></div>
@@ -216,7 +215,7 @@ const App = () => {
                             </Button>
                         </div>
                         {error ? (
-                            <div className="text-center mt-5 text-red-500">{error}</div>
+                            <div className="text-center mt-5 text-base text-red-500">{error}</div>
                         ) : (
                             <></>
                         )}
