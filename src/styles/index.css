@@ -8,11 +8,6 @@ body {
     font-family: 'Poppins', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* background-image: url('../assets/bg-logo.png');
-    background-repeat: no-repeat;
-    background-position: 25%;
-    background-size: 50em;
-    background-attachment: fixed; */
     width: 550px;
     height: 550px;
     overflow: hidden;
