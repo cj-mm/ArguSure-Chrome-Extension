@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai'
 import { Button, Spinner, Textarea } from 'flowbite-react'
 import CounterargsContainer from '../components/CounterargsCountainer'
 import PopupLandingPage from './PopupLandingPage'
@@ -95,28 +95,77 @@ const App = () => {
             currentInput.current = inputClaim
             setError(null)
             setLoading(true)
+            const safetySettings = [
+                {
+                    category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+                    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+                },
+                {
+                    category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+                },
+                {
+                    category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+                },
+                {
+                    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+                }
+            ]
             const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
             const chat = model.startChat({
                 generationConfig: {
                     maxOutputTokens: 4096
-                }
+                },
+                safetySettings
             })
-            const claim = `'${inputClaim}'`
+            const claim = `${inputClaim}`
 
-            const askClaimMsg = `Strictly yes or no, is "${claim}" a claim?`
-            const askClaimMsgResult = await chat.sendMessage(askClaimMsg)
-            const askClaimMsgResponse = askClaimMsgResult.response.text()
-            const askArgMsg = `Strictly yes or no, is "${claim}" an argument?`
+            const askArgMsg = `Strictly yes or no, is "${claim}" an argument? Please note that an argument is a coherent series of reasons, statements, or facts intended to support or establish a point of view.`
             const askArgMsgResult = await chat.sendMessage(askArgMsg)
             const askArgMsgResponse = askArgMsgResult.response.text()
-            if (
-                askClaimMsgResponse.toLowerCase().includes('no') &&
-                askArgMsgResponse.toLowerCase().includes('no')
-            ) {
-                setError('The input is neither a claim nor an argument.')
-                setLoading(false)
-                setCounterarguments([])
-                return
+            console.log('Is an argument? ' + askArgMsgResponse)
+
+            if (askArgMsgResponse.toLowerCase().includes('no')) {
+                const askClaimMsg = `Strictly yes or no, is "${claim}" a claim? Please note that a claim is an assertion open to challenge.`
+                const askClaimMsgResult = await chat.sendMessage(askClaimMsg)
+                const askClaimMsgResponse = askClaimMsgResult.response.text()
+                console.log('Is a claim? ' + askClaimMsgResponse)
+
+                if (askClaimMsgResponse.toLowerCase().includes('yes')) {
+                    const askCategoryPrompt = `
+          Categorize the sentence "${claim}" into seven categories:
+  
+          1. Personal experience: Claims that aren't capable of being checked using publicly-available information, e.g. "I can't save for a deposit."
+          2. Quantity in the past or present: Current value of something e.g. "1 in 4 wait longer than 6 weeks to be seen by a doctor." Changing quantity, e.g. "The Coalition Government has created 1,000 jobs for every day it's been in office." Comparison, e.g. "Free schools are outperforming state schools.". Ranking, e.g. "The UK's the largest importer from the Eurozone."
+          3. Correlation or causation: Correlation e.g. "GCSEs are a better predictor than AS if a student will get a good degree." Causation, e.g. "Tetanus vaccine causes infertility." Absence of a link, e.g. "Grammar schools don't aid social mobility."
+          4. Current laws or rules of operation: Declarative sentences, which generally have the word "must" or legal terms, e.g. "The UK allows a single adult to care for fewer children than other European countries." Procedures of public institutions, e.g. "Local decisions about commissioning services are now taken by organisations that are led by clinicians." Rules and changes, e.g. "EU residents cannot claim Jobseeker's Allowance if they have been in the country for 6 months and have not been able to find work."
+          5. Prediction: Hypothetical claims about the future e.g. "Indeed, the IFS says that school funding will have fallen by 5% in real terms by 2019 as a result of government policies."
+          6. Other type of claim: Voting records e.g "You voted to leave, didn't you?" Public Opinion e.g "Public satisfaction with the NHS in Wales is lower than it is in England." Support e.g. "The party promised free childcare" Definitions, e.g. "Illegal killing of people is what's known as murder." Any other sentence that you think is a claim.
+          7. Not a claim: These are sentences that don't fall into any categories and aren't claims. e.g. "What do you think?.", "Questions to the Prime Minister!"
+          
+          Use only one of the 7 labels, do not provide any additional explanation.
+          `
+                    const askCategoryPromptResult = await chat.sendMessage(askCategoryPrompt)
+                    const askCategoryPromptResponse = askCategoryPromptResult.response.text()
+                    console.log('Category? ' + askCategoryPromptResponse)
+
+                    if (
+                        askCategoryPromptResponse.toLowerCase().includes('personal experience') ||
+                        askCategoryPromptResponse.toLowerCase().includes('not a claim')
+                    ) {
+                        setError('The input is not suitable for counterarguments.')
+                        setLoading(false)
+                        setCounterarguments([])
+                        return
+                    }
+                } else {
+                    setError('The input is neither a claim nor an argument.')
+                    setLoading(false)
+                    setCounterarguments([])
+                    return
+                }
             }
 
             const msgs = [
