@@ -169,9 +169,7 @@ const App = () => {
             }
 
             const msgs = [
-                'Provide one argument against ' +
-                    claim +
-                    ' strictly with summary (in paragraph form labeled as **Summary:**), body (in paragraph form labeled as **Body:**), and source (labeled as **Source:**) as the format',
+                `Provide one argument against "${claim}" strictly with summary (in paragraph form labeled as **Summary:**), body (in paragraph labeled as **Body:**), and source (in bullet points labeled as **Source:**) as the format.`,
                 'Provide another one with the same format',
                 'Provide another one again with the same format'
             ]
@@ -197,7 +195,7 @@ const App = () => {
             for (let i = 0; i < counterargs.length; i++) {
                 const counterarg = counterargs[i]
                 const data = await handleRecord(
-                    claim.slice(1, -1),
+                    claim.trim(),
                     counterarg.summary,
                     counterarg.body,
                     counterarg.source
