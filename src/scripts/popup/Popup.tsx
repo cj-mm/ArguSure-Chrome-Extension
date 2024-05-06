@@ -213,7 +213,7 @@ const App = () => {
 
     return (
         <div className="flex w-full h-full">
-            <div className="popup-container m-auto p-2 bg-clight w-full h-full rounded cshadow">
+            <div className="popup-container m-auto p-2 bg-clight w-full h-full rounded">
                 {currentUser ? ( // make this true if developing
                     <div className="w-full h-full">
                         <div className="flex gap-1 m-3">
