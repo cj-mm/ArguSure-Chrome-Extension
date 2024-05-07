@@ -17,6 +17,7 @@ const App = () => {
     const [counterarguments, setCounterarguments] = useState([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
+    const [loadingPrompt, setLoadingPrompt] = useState(null)
     const currentInput = useRef('')
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const prompt = useSelector((state: RootState) => state.counterarg.prompt)
@@ -81,12 +82,14 @@ const App = () => {
         try {
             if (!inputClaim) {
                 setError('Please input something!')
+                setLoadingPrompt(null)
                 setLoading(false)
                 setCounterarguments([])
                 return
             }
             if (inputClaim.length > charLimit) {
                 setError(`Please input up to ${charLimit} characters only.`)
+                setLoadingPrompt(null)
                 setLoading(false)
                 setCounterarguments([])
                 return
@@ -122,6 +125,7 @@ const App = () => {
             })
             const claim = `${inputClaim}`
 
+            setLoadingPrompt('Assessing the input...')
             const askArgMsg = `Strictly yes or no, is "${claim}" an argument? Please note that an argument is a coherent series of reasons, statements, or facts intended to support or establish a point of view.`
             const askArgMsgResult = await chat.sendMessage(askArgMsg)
             const askArgMsgResponse = askArgMsgResult.response.text()
@@ -134,6 +138,7 @@ const App = () => {
                 console.log('Is a claim? ' + askClaimMsgResponse)
 
                 if (askClaimMsgResponse.toLowerCase().includes('yes')) {
+                    setLoadingPrompt('Identifying the type of claim...')
                     const askCategoryPrompt = `
           Categorize the sentence "${claim}" into seven categories:
   
@@ -156,18 +161,21 @@ const App = () => {
                         askCategoryPromptResponse.toLowerCase().includes('not a claim')
                     ) {
                         setError('The input is not suitable for counterarguments.')
+                        setLoadingPrompt(null)
                         setLoading(false)
                         setCounterarguments([])
                         return
                     }
                 } else {
                     setError('The input is neither a claim nor an argument.')
+                    setLoadingPrompt(null)
                     setLoading(false)
                     setCounterarguments([])
                     return
                 }
             }
 
+            setLoadingPrompt('Generating counterarguments...')
             const msgs = [
                 `Provide one argument against "${claim}" strictly with summary (in paragraph form labeled as **Summary:**), body (in paragraph labeled as **Body:**), and source (in bullet points labeled as **Source:**) as the format.`,
                 'Provide another one with the same format',
@@ -189,7 +197,9 @@ const App = () => {
                 const source = text.substring(sourcePos + 11).trim()
                 const counterarg = { summary, body, source }
                 counterargs.push(counterarg)
+                setLoadingPrompt(`Generated ${i + 1}/3 counterarguments...`)
             }
+            setLoadingPrompt(null)
             setLoading(false)
             setError(null)
             for (let i = 0; i < counterargs.length; i++) {
@@ -204,6 +214,7 @@ const App = () => {
             }
             setCounterarguments(counterargs)
         } catch (error) {
+            setLoadingPrompt(null)
             setLoading(false)
             setCounterarguments([])
             setError('Counterargument generation failed! Please try again.')
@@ -268,7 +279,12 @@ const App = () => {
                         )}
                         <div>
                             {loading ? (
-                                <Spinner className="w-full mt-16 h-14 fill-cgreen" />
+                                <div className="w-full mt-16 text-center">
+                                    <Spinner className="h-14 fill-cgreen mr-2" />
+                                    <span className="text-base text-cgreen font-bold">
+                                        {loadingPrompt}
+                                    </span>
+                                </div>
                             ) : counterarguments.length !== 0 ? (
                                 <>
                                     <div className="flex mt-2">
