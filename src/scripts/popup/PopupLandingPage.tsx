@@ -9,10 +9,9 @@ export default function PopupLandingPage() {
         <div className="landing-page flex flex-col gap-10 text-center w-full h-full py-16 px-7 overflow-hidden">
             <div className="text-4xl text-cgreen font-extrabold z-10">ArguSure</div>
             <div className="text-cblack text-lg italic z-10 leading-7">
-                You are browsing your social media feed and you read something you agree with. You
-                think that that is correct, but are you sure? To maintain an impartial and objective
-                stance, it might be beneficial for you to think again. After all, you are probably
-                in a{' '}
+                You are browsing the Internet and you read something you agree with. You think that
+                that is correct, but are you sure? To maintain an impartial and objective stance, it
+                might be beneficial for you to think again. After all, you are probably in a{' '}
                 <a
                     className="underline"
                     href="https://www.google.com/search?q=Filter+Bubble&rlz=1C1KNTJ_enPH1072PH1072&oq=Filter+Bubble&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIGCAEQRRg9MgYIAhBFGD0yBggDEEUYPdIBCDI2NTRqMGoxqAIAsAIA&sourceid=chrome&ie=UTF-8"
