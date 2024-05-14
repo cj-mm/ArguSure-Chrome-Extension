@@ -231,7 +231,7 @@ const App = () => {
                             <div className="flex-1"></div>
                             <div className="text-cgreen text-left m-auto font-extrabold text-xl">
                                 <Link to={homepageRoute} target="_blank" rel="noopener noreferrer">
-                                    <span className="hover:cursor-pointer">Lorem Ipsum</span>
+                                    <span className="hover:cursor-pointer">ArguSure</span>
                                 </Link>
                             </div>
                             <div className="flex-1"></div>
@@ -324,16 +324,23 @@ const App = () => {
                                 </>
                             ) : (
                                 <div className="flex flex-col gap-2 m-auto text-center my-1">
-                                    <div className="text-cblack text-base italic p-5">
-                                        ..... Lorem ipsum dolor sit amet, consectetur adipiscing
-                                        elit. Sed sodales velit vulputate magna euismod, vel maximus
-                                        quam aliquam. Nulla eu sem vitae metus fringilla fermentum.
-                                        Integer ante tortor, dictum a augue eget, efficitur
-                                        tristique tellus. Quisque pretium feugiat blandit. Nam
-                                        scelerisque rutrum dolor eget finibus. Vivamus nec nisl
-                                        ultrices, auctor ante vitae, lacinia lorem. Aenean
-                                        ullamcorper tristique ullamcorper. Vestibulum finibus erat
-                                        nibh, nec mollis nisl eleifend non .....
+                                    <div className="text-cblack text-base italic p-10 leading-7">
+                                        You are browsing your social media feed and you read
+                                        something you agree with. You think that that is correct,
+                                        but are you sure? To maintain an impartial and objective
+                                        stance, it might be beneficial for you to think again. After
+                                        all, you are probably in a{' '}
+                                        <a
+                                            className="underline"
+                                            href="https://www.google.com/search?q=Filter+Bubble&rlz=1C1KNTJ_enPH1072PH1072&oq=Filter+Bubble&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIGCAEQRRg9MgYIAhBFGD0yBggDEEUYPdIBCDI2NTRqMGoxqAIAsAIA&sourceid=chrome&ie=UTF-8"
+                                            target="_blank"
+                                        >
+                                            Filter Bubble
+                                        </a>
+                                        . No worries though, <b>ArguSure</b> is here to help!
+                                        Powered by Google's multimodal LLM called Gemini, it is a
+                                        counterargument generator that lets you conveniently seek
+                                        and explore different, contradictory ideas.
                                     </div>
                                     <div>
                                         <Link
