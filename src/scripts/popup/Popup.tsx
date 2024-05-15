@@ -140,25 +140,25 @@ const App = () => {
                 if (askClaimMsgResponse.toLowerCase().includes('yes')) {
                     setLoadingPrompt('Identifying the type of claim...')
                     const askCategoryPrompt = `
-          Categorize the sentence "${claim}" into seven categories:
-  
-          1. Personal experience: Claims that aren't capable of being checked using publicly-available information, e.g. "I can't save for a deposit."
-          2. Quantity in the past or present: Current value of something e.g. "1 in 4 wait longer than 6 weeks to be seen by a doctor." Changing quantity, e.g. "The Coalition Government has created 1,000 jobs for every day it's been in office." Comparison, e.g. "Free schools are outperforming state schools.". Ranking, e.g. "The UK's the largest importer from the Eurozone."
-          3. Correlation or causation: Correlation e.g. "GCSEs are a better predictor than AS if a student will get a good degree." Causation, e.g. "Tetanus vaccine causes infertility." Absence of a link, e.g. "Grammar schools don't aid social mobility."
-          4. Current laws or rules of operation: Declarative sentences, which generally have the word "must" or legal terms, e.g. "The UK allows a single adult to care for fewer children than other European countries." Procedures of public institutions, e.g. "Local decisions about commissioning services are now taken by organisations that are led by clinicians." Rules and changes, e.g. "EU residents cannot claim Jobseeker's Allowance if they have been in the country for 6 months and have not been able to find work."
-          5. Prediction: Hypothetical claims about the future e.g. "Indeed, the IFS says that school funding will have fallen by 5% in real terms by 2019 as a result of government policies."
-          6. Other type of claim: Voting records e.g "You voted to leave, didn't you?" Public Opinion e.g "Public satisfaction with the NHS in Wales is lower than it is in England." Support e.g. "The party promised free childcare" Definitions, e.g. "Illegal killing of people is what's known as murder." Any other sentence that you think is a claim.
-          7. Not a claim: These are sentences that don't fall into any categories and aren't claims. e.g. "What do you think?.", "Questions to the Prime Minister!"
-          
-          Use only one of the 7 labels, do not provide any additional explanation.
-          `
+                    Categorize the sentence "${claim}" into seven categories:
+            
+                    1. Personal experience (PE): Claims that aren't capable of being checked using publicly-available information, e.g. "I can't save for a deposit."
+                    2. Quantity in the past or present (Q): Current value of something e.g. "1 in 4 wait longer than 6 weeks to be seen by a doctor." Changing quantity, e.g. "The Coalition Government has created 1,000 jobs for every day it's been in office." Comparison, e.g. "Free schools are outperforming state schools.". Ranking, e.g. "The UK's the largest importer from the Eurozone."
+                    3. Correlation or causation (CC): Correlation e.g. "GCSEs are a better predictor than AS if a student will get a good degree." Causation, e.g. "Tetanus vaccine causes infertility." Absence of a link, e.g. "Grammar schools don't aid social mobility."
+                    4. Current laws or rules of operation (CLO): Declarative sentences, which generally have the word "must" or legal terms, e.g. "The UK allows a single adult to care for fewer children than other European countries." Procedures of public institutions, e.g. "Local decisions about commissioning services are now taken by organisations that are led by clinicians." Rules and changes, e.g. "EU residents cannot claim Jobseeker's Allowance if they have been in the country for 6 months and have not been able to find work."
+                    5. Prediction (P): Hypothetical claims about the future e.g. "Indeed, the IFS says that school funding will have fallen by 5% in real terms by 2019 as a result of government policies."
+                    6. Other type of claim (OTC): Voting records e.g "You voted to leave, didn't you?" Public Opinion e.g "Public satisfaction with the NHS in Wales is lower than it is in England." Support e.g. "The party promised free childcare" Definitions, e.g. "Illegal killing of people is what's known as murder." Any other sentence that you think is a claim.
+                    7. Not a claim (NAC): These are sentences that don't fall into any categories and aren't claims. e.g. "What do you think?.", "Questions to the Prime Minister!"
+                    
+                    Strictly use only one of the 7 labels (PE, Q, CC, CLO, P, OTC, NAC), do not provide any additional explanation.
+                    `
                     const askCategoryPromptResult = await chat.sendMessage(askCategoryPrompt)
                     const askCategoryPromptResponse = askCategoryPromptResult.response.text()
                     console.log('Category? ' + askCategoryPromptResponse)
 
                     if (
-                        askCategoryPromptResponse.toLowerCase().includes('personal experience') ||
-                        askCategoryPromptResponse.toLowerCase().includes('not a claim')
+                        askCategoryPromptResponse.toLowerCase().includes('pe') ||
+                        askCategoryPromptResponse.toLowerCase().includes('nac')
                     ) {
                         setError('The input is not suitable for counterarguments.')
                         setLoadingPrompt(null)
@@ -177,9 +177,15 @@ const App = () => {
 
             setLoadingPrompt('Generating counterarguments...')
             const msgs = [
-                `Provide one argument against "${claim}" strictly with summary (in paragraph form labeled as **Summary:**), body (in paragraph labeled as **Body:**), and source (in bullet points labeled as **Source:**) as the format.`,
-                'Provide another one with the same format',
-                'Provide another one again with the same format'
+                `Please provide one argument against "${claim}" strictly with summary (in paragraph form labeled as **Summary:**), body (in paragraph labeled as **Body:**), and source (in bullet points labeled as **Source:**) as the format. The argument should well-structured and organized in a coherent manner.
+                
+                Please make sure that the argument will refute "${claim}" and not support it.`,
+                `Please provide another argument against "${claim}" strictly with summary (in paragraph form labeled as **Summary:**), body (in paragraph labeled as **Body:**), and source (in bullet points labeled as **Source:**) as the format. The argument should well-structured and organized in a coherent manner.
+                
+                Please make sure that the argument will refute "${claim}" and not support it.`,
+                `Again, please provide another argument against "${claim}" strictly with summary (in paragraph form labeled as **Summary:**), body (in paragraph labeled as **Body:**), and source (in bullet points labeled as **Source:**) as the format. The argument should well-structured and organized in a coherent manner.
+                
+                Please make sure that the argument will refute "${claim}" and not support it.`
             ]
             const numOfCounterarguments = 3
             let counterargs = []
