@@ -251,7 +251,7 @@ const App = () => {
                             >
                                 <img
                                     src={currentUser && currentUser.profilePicture}
-                                    className="h-12 rounded-full  hover:cursor-pointer"
+                                    className="h-12 w-12 rounded-full  hover:cursor-pointer"
                                 ></img>
                             </Link>
 
