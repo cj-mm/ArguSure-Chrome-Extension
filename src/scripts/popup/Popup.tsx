@@ -263,7 +263,7 @@ const App = () => {
                                 maxLength={charLimit}
                             />
                             <Button
-                                className="bg-cbrown text-clight font-semibold w-44 h-10 mt-2 hover:shadow-lg enabled:hover:bg-yellow-900 "
+                                className="bg-cbrown text-clight font-semibold w-44 h-12 mt-2 hover:shadow-lg enabled:hover:bg-yellow-900 "
                                 type="button"
                                 onClick={generateCounterarguments}
                                 disabled={inputClaim && !loading ? false : true}
@@ -274,7 +274,7 @@ const App = () => {
                                         <span className="ml-1">Generating...</span>
                                     </>
                                 ) : (
-                                    'Generate'
+                                    <span className="m-0 p-0">Generate Counterarguments</span>
                                 )}
                             </Button>
                         </div>

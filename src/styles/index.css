@@ -72,6 +72,10 @@ textarea {
     z-index: 10;
 }
 
+.home-input button span {
+    padding: 0;
+}
+
 @keyframes mySecond {
     0% {
         bottom: 50px;
