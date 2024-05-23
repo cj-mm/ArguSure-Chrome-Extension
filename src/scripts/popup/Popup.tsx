@@ -269,10 +269,10 @@ const App = () => {
                                 disabled={inputClaim && !loading ? false : true}
                             >
                                 {loading ? (
-                                    <>
+                                    <span className="mt-3">
                                         <Spinner size="sm" />
                                         <span className="ml-1">Generating...</span>
-                                    </>
+                                    </span>
                                 ) : (
                                     <span className="m-0 p-0">Generate Counterarguments</span>
                                 )}
