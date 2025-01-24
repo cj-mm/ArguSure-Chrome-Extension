@@ -8,7 +8,7 @@ For more info, please see [this repository](https://github.com/cj-mm/ArguSure).
 
 #### Context Menu
 
-![Context Menu](screenshots/context_menu.png)
+![Context menu](screenshots/context_menu.png)
 
 #### Window Popup
 
