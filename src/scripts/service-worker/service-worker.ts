@@ -1,5 +1,5 @@
 console.log('Background Service Worker Loaded')
-const windowPopupRoute = 'http://localhost:5173/window-popup?selectedText='
+const windowPopupRoute = 'https://argusure.onrender.com/window-popup?selectedText='
 
 chrome.runtime.onInstalled.addListener(async () => {
     console.log('Extension installed')

@@ -8,7 +8,7 @@ import { useLocation } from 'react-router-dom'
 import type { RootState } from '../../redux/store'
 
 export default function AddTopic() {
-    const backendServerRoute = 'http://localhost:5000'
+    const backendServerRoute = 'https://argusure.onrender.com'
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const addTopic = useSelector((state: RootState) => state.counterarg.addTopic)
     const [inputTopic, setInputTopic] = useState('')

@@ -2,8 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 export default function PopupLandingPage() {
-    const signinRoute = 'http://localhost:5173/sign-in'
-    const signupRoute = 'http://localhost:5173/sign-up'
+    const signinRoute = 'https://argusure.onrender.com/sign-in'
+    const signupRoute = 'https://argusure.onrender.com/sign-up'
 
     return (
         <div className="landing-page flex flex-col gap-10 text-center w-full h-full py-16 px-7 overflow-hidden">

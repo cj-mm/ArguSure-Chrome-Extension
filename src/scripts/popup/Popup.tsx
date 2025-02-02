@@ -10,7 +10,7 @@ import { signInSuccess } from '@/redux/user/userSlice'
 import Prompt from '../components/Prompt'
 
 const App = () => {
-    const backendServerRoute = 'http://localhost:5000'
+    const backendServerRoute = 'https://argusure.onrender.com'
     const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
     const [inputClaim, setInputClaim] = useState('')
@@ -24,8 +24,8 @@ const App = () => {
     const promptText = useSelector((state: RootState) => state.counterarg.promptText)
     const dispatch = useDispatch()
     const charLimit = 500
-    const homepageRoute = 'http://localhost:5173/'
-    const profilepageRoute = 'http://localhost:5173/profile'
+    const homepageRoute = 'https://argusure.onrender.com/'
+    const profilepageRoute = 'https://argusure.onrender.com/profile'
 
     useEffect(() => {
         const onMount = async () => {

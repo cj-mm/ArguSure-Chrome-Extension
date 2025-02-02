@@ -21,7 +21,7 @@ import UnsaveModal from './UnsaveModal'
 import SaveTo from './SaveTo'
 
 export default function CounterargsContainer({ counterargument, withClaim }) {
-    const backendServerRoute = 'http://localhost:5000'
+    const backendServerRoute = 'https://argusure.onrender.com'
     const claim =
         counterargument.inputClaim.charAt(0).toUpperCase() + counterargument.inputClaim.slice(1)
     const summary = counterargument.summary
