@@ -1,6 +1,6 @@
 # Chrome Extension for ArguSure
 
-With the goal of alleviating the negative effects of Filter bubbles, ArguSure is a Gemini-based Chrome Extension for Counterargument Generation. Powered by Google's multimodal LLM called Gemini, it is a counterargument generator Chrome extension designed to provide a way for users to conveniently explore counter viewpoints, especially the ones refuting what they see in digital spaces.
+Powered by Google's multimodal LLM called Gemini, ArguSure is a Chrome Extension for Counterargument Generation. With the goal of alleviating the negative effects of filter bubbles, it is designed not to tell you what is right or wrong, but to introduce you to different perspectives you might miss because of how some algorithms on the internet work.
 
 For more info, please see [this repository](https://github.com/cj-mm/ArguSure).
 
