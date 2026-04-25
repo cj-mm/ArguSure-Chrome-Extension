@@ -197,6 +197,13 @@ const App = () => {
             }
 
             setLoadingPrompt('Generating counterarguments...')
+
+            const generationChat = model.startChat({
+                generationConfig: {
+                    maxOutputTokens: 2048
+                }
+            })
+
             const msgs = [
                 `Please provide one argument against "${claim}" strictly with summary (in paragraph form labeled as **Summary:**), body (in paragraph form labeled as **Body:**), and source (in bullet points labeled as **Source:**) as the format. The argument should be well-structured and organized in a coherent manner.
                 
@@ -212,7 +219,7 @@ const App = () => {
             let counterargs = []
             for (let i = 0; i < numOfCounterarguments; i++) {
                 const msg = msgs[i]
-                const result = await model.generateContent(msg)
+                const result = await generationChat.sendMessage(msg)
                 const response = await result.response
                 const text = response.text()
                 console.log(text)
