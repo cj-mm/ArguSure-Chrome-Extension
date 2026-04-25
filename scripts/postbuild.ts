@@ -5,4 +5,4 @@ const postBuildCommands = async () => {
     await writeManifest()
 }
 
-export default postBuildCommands
+postBuildCommands()
