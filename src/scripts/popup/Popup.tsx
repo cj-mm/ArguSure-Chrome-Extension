@@ -52,7 +52,8 @@ const App = () => {
             // remove backendServerRoute if in development mode
             const res = await fetch(`${BASE_URL}/api/user/getuser`, {
                 method: 'GET',
-                mode: 'cors'
+                mode: 'cors',
+                credentials: 'include'
             })
             const data = await res.json()
             if (!res.ok) {
@@ -82,7 +83,8 @@ const App = () => {
             const res = await fetch(`${BASE_URL}/api/counterarg/record`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(counterargData)
+                body: JSON.stringify(counterargData),
+                credentials: 'include'
             })
             const data = await res.json()
             if (!res.ok) {
