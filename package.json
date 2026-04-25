@@ -10,9 +10,9 @@
         "tailwind": "tailwindcss -i src/styles/index.css -o dist/assets/index.css",
         "dev": "vite",
         "build": "npm run build:pre && tsc && vite build && npm run build:content && npm run build:post",
-        "build:pre": "esno scripts/prebuild.ts",
+        "build:pre": "tsx scripts/prebuild.ts",
         "build:content": "vite build --config vite.config.content.ts",
-        "build:post": "esno scripts/postbuild.ts",
+        "build:post": "tsx scripts/postbuild.ts",
         "preview": "vite preview"
     },
     "author": "Doug Silkstone <doug@withseismic.com>",
