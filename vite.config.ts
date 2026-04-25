@@ -3,7 +3,6 @@ import react from '@vitejs/plugin-react'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import { fileURLToPath } from 'url'
 import AutoImport from 'unplugin-auto-import/vite'
-import postBuildCommands from './scripts/postbuild'
 import preBuildCommands from './scripts/prebuild'
 import * as path from 'path'
 
@@ -75,9 +74,6 @@ function postbuildManifestPlugin() {
         name: 'postbuild-manifest',
         buildStart: async () => {
             preBuildCommands()
-        },
-        closeBundle: async () => {
-            postBuildCommands()
         }
     }
 }
