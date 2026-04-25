@@ -1,1 +1,2 @@
-// PUT CONTENT SCRIPT HERE
+// Reserved for future content script functionality
+export {}
