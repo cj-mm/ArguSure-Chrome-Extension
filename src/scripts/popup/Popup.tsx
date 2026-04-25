@@ -9,8 +9,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { signInSuccess } from '@/redux/user/userSlice'
 import Prompt from '../components/Prompt'
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
+const homepageRoute = `${BASE_URL}/`
+const profilepageRoute = `${BASE_URL}/profile`
+
 const App = () => {
-    const backendServerRoute = 'https://argusure.onrender.com'
     const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
     const [inputClaim, setInputClaim] = useState('')
@@ -24,8 +27,6 @@ const App = () => {
     const promptText = useSelector((state: RootState) => state.counterarg.promptText)
     const dispatch = useDispatch()
     const charLimit = 500
-    const homepageRoute = 'https://argusure.onrender.com/'
-    const profilepageRoute = 'https://argusure.onrender.com/profile'
 
     useEffect(() => {
         const onMount = async () => {
@@ -37,7 +38,7 @@ const App = () => {
     const getCurrentUser = async () => {
         try {
             // remove backendServerRoute if in development mode
-            const res = await fetch(backendServerRoute + `/api/user/getuser`, {
+            const res = await fetch(`${BASE_URL}/api/user/getuser`, {
                 method: 'GET',
                 mode: 'cors'
             })
@@ -61,7 +62,7 @@ const App = () => {
     const handleRecord = async (claim, summary, body, source) => {
         const counterargData = { inputClaim: claim, summary, body, source }
         try {
-            const res = await fetch(backendServerRoute + '/api/counterarg/record', {
+            const res = await fetch(`${BASE_URL}/api/counterarg/record`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(counterargData)
@@ -116,24 +117,25 @@ const App = () => {
                     threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
                 }
             ]
-            const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
-            const chat = model.startChat({
+            const model = genAI.getGenerativeModel({
+                model: 'gemini-2.5-flash',
                 generationConfig: {
                     maxOutputTokens: 2048
                 },
                 safetySettings
             })
+
             const claim = `${inputClaim}`
 
             setLoadingPrompt('Assessing the input...')
             const askArgMsg = `Strictly yes or no, is "${claim}" an argument? Please note that an argument is a coherent series of reasons, statements, or facts intended to support or establish a point of view.`
-            const askArgMsgResult = await chat.sendMessage(askArgMsg)
+            const askArgMsgResult = await model.generateContent(askArgMsg)
             const askArgMsgResponse = askArgMsgResult.response.text()
             console.log('Is an argument? ' + askArgMsgResponse)
 
             if (askArgMsgResponse.toLowerCase().includes('no')) {
                 const askClaimMsg = `Strictly yes or no, is "${claim}" a claim? Please note that a claim is an assertion open to challenge.`
-                const askClaimMsgResult = await chat.sendMessage(askClaimMsg)
+                const askClaimMsgResult = await model.generateContent(askClaimMsg)
                 const askClaimMsgResponse = askClaimMsgResult.response.text()
                 console.log('Is a claim? ' + askClaimMsgResponse)
 
@@ -152,7 +154,7 @@ const App = () => {
                     
                     Strictly use only one of the 7 labels (PE, Q, CC, CLO, P, OTC, NAC), do not provide any additional explanation.
                     `
-                    const askCategoryPromptResult = await chat.sendMessage(askCategoryPrompt)
+                    const askCategoryPromptResult = await model.generateContent(askCategoryPrompt)
                     const askCategoryPromptResponse = askCategoryPromptResult.response.text()
                     console.log('Category? ' + askCategoryPromptResponse)
 
@@ -191,16 +193,39 @@ const App = () => {
             let counterargs = []
             for (let i = 0; i < numOfCounterarguments; i++) {
                 const msg = msgs[i]
-                const result = await chat.sendMessage(msg)
+                const result = await model.generateContent(msg)
                 const response = await result.response
                 const text = response.text()
                 console.log(text)
-                const summaryPos = text.indexOf('**Summary:**')
-                const bodyPos = text.indexOf('**Body:**')
-                const sourcePos = text.indexOf('**Source:**')
-                const summary = text.substring(summaryPos + 12, bodyPos).trim()
-                const body = text.substring(bodyPos + 9, sourcePos).trim()
-                const source = text.substring(sourcePos + 11).trim()
+
+                const SUMMARY_LABEL = '**Summary:**'
+                const BODY_LABEL = '**Body:**'
+                const SOURCE_LABEL = '**Source:**'
+
+                const summaryPos = text.indexOf(SUMMARY_LABEL)
+                const bodyPos = text.indexOf(BODY_LABEL)
+                const sourcePos = text.indexOf(SOURCE_LABEL)
+
+                if (summaryPos === -1 || bodyPos === -1 || sourcePos === -1) {
+                    setError('The AI returned an unexpected format. Please try again.')
+                    setLoadingPrompt(null)
+                    setLoading(false)
+                    setCounterarguments([])
+                    return
+                }
+
+                const summary = text.substring(summaryPos + SUMMARY_LABEL.length, bodyPos).trim()
+                const body = text.substring(bodyPos + BODY_LABEL.length, sourcePos).trim()
+                const source = text.substring(sourcePos + SOURCE_LABEL.length).trim()
+
+                if (!summary || !body || !source) {
+                    setError('The AI returned incomplete content. Please try again.')
+                    setLoadingPrompt(null)
+                    setLoading(false)
+                    setCounterarguments([])
+                    return
+                }
+
                 const counterarg = { summary, body, source }
                 counterargs.push(counterarg)
                 setLoadingPrompt(`Generated ${i + 1}/3 counterarguments...`)
