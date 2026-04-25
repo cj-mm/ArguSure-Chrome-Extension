@@ -9,10 +9,10 @@
         "start": "concurrently \"npm run dev\" \"npm run build\"",
         "tailwind": "tailwindcss -i src/styles/index.css -o dist/assets/index.css",
         "dev": "vite",
-        "build": "tsc && vite build && npm run build:js",
+        "build": "npm run build:pre && tsc && vite build && npm run build:content && npm run build:post",
         "build:pre": "esno scripts/prebuild.ts",
+        "build:content": "vite build --config vite.config.content.ts",
         "build:post": "esno scripts/postbuild.ts",
-        "build:js": "vite build --config vite.config.content.ts",
         "preview": "vite preview"
     },
     "author": "Doug Silkstone <doug@withseismic.com>",
@@ -44,7 +44,7 @@
         "webextension-polyfill-ts": "^0.26.0"
     },
     "dependencies": {
-        "@google/generative-ai": "^0.7.1",
+        "@google/generative-ai": "^0.24.1",
         "@reduxjs/toolkit": "^2.2.3",
         "dotenv": "^16.4.5",
         "flowbite-react": "^0.9.0",
