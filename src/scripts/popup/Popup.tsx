@@ -13,14 +13,26 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL
 const homepageRoute = `${BASE_URL}/`
 const profilepageRoute = `${BASE_URL}/profile`
 
+interface Counterargument {
+    _id?: string
+    inputClaim?: string
+    summary: string
+    body: string
+    source: string
+    liked?: string
+    userId?: string
+    createdAt?: string
+    updatedAt?: string
+}
+
 const App = () => {
     const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
-    const [inputClaim, setInputClaim] = useState('')
-    const [counterarguments, setCounterarguments] = useState([])
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(null)
-    const [loadingPrompt, setLoadingPrompt] = useState(null)
+    const [inputClaim, setInputClaim] = useState<string>('')
+    const [counterarguments, setCounterarguments] = useState<Counterargument[]>([])
+    const [loading, setLoading] = useState<boolean>(false)
+    const [error, setError] = useState<string | null>(null)
+    const [loadingPrompt, setLoadingPrompt] = useState<string | null>(null)
     const currentInput = useRef('')
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const prompt = useSelector((state: RootState) => state.counterarg.prompt)
@@ -59,7 +71,12 @@ const App = () => {
         setInputClaim(e.target.value)
     }
 
-    const handleRecord = async (claim, summary, body, source) => {
+    const handleRecord = async (
+        claim: string,
+        summary: string,
+        body: string,
+        source: string
+    ): Promise<Counterargument | undefined> => {
         const counterargData = { inputClaim: claim, summary, body, source }
         try {
             const res = await fetch(`${BASE_URL}/api/counterarg/record`, {
