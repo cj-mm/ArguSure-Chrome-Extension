@@ -13,8 +13,9 @@ import {
 } from '../../redux/counterargument/counterargSlice'
 import type { RootState } from '../../redux/store'
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
+
 export default function UnsaveModal() {
-    const backendServerRoute = 'https://argusure.onrender.com'
     const loading = useSelector((state: RootState) => state.user.loading)
     const unsaveModal = useSelector((state: RootState) => state.counterarg.unsaveModal)
     const unsaveDataBody = useSelector((state: RootState) => state.counterarg.unsaveDataBody)
@@ -23,7 +24,7 @@ export default function UnsaveModal() {
 
     const handleUnsave = async () => {
         try {
-            const res = await fetch(backendServerRoute + '/api/saved/unsave', {
+            const res = await fetch(`${BASE_URL}/api/saved/unsave`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(unsaveDataBody)

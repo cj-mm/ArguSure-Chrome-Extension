@@ -1,10 +1,11 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-export default function PopupLandingPage() {
-    const signinRoute = 'https://argusure.onrender.com/sign-in'
-    const signupRoute = 'https://argusure.onrender.com/sign-up'
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
+const signinRoute = `${BASE_URL}/sign-in`
+const signupRoute = `${BASE_URL}/sign-up`
 
+export default function PopupLandingPage() {
     return (
         <div className="landing-page flex flex-col gap-10 text-center w-full h-full py-16 px-7 overflow-hidden">
             <div className="text-4xl text-cgreen font-extrabold z-10">ArguSure</div>

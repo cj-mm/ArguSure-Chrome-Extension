@@ -1,5 +1,5 @@
 console.log('Background Service Worker Loaded')
-const windowPopupRoute = 'https://argusure.onrender.com/window-popup?selectedText='
+const windowPopupRoute = `${import.meta.env.VITE_API_BASE_URL}/window-popup?selectedText=`
 
 chrome.runtime.onInstalled.addListener(async () => {
     console.log('Extension installed')

@@ -15,8 +15,9 @@ import {
 import type { RootState } from '../../redux/store'
 import AddTopic from './AddTopic'
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
+
 export default function SaveTo() {
-    const backendServerRoute = 'https://argusure.onrender.com'
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const saveToModal = useSelector((state: RootState) => state.counterarg.saveToModal)
     const addTopic = useSelector((state: RootState) => state.counterarg.addTopic)
@@ -32,7 +33,7 @@ export default function SaveTo() {
         if (counterargument) {
             const getCurrentUser = async () => {
                 try {
-                    const res = await fetch(backendServerRoute + `/api/user/getuser`, {
+                    const res = await fetch(`${BASE_URL}/api/user/getuser`, {
                         method: 'GET'
                     })
                     const data = await res.json()
@@ -80,7 +81,7 @@ export default function SaveTo() {
         }
         console.log(dataBody.selectedTopics)
         try {
-            const res = await fetch(backendServerRoute + '/api/saved/save', {
+            const res = await fetch(`${BASE_URL}/api/saved/save`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dataBody)

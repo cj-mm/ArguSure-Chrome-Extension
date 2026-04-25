@@ -7,8 +7,9 @@ import { hideAddTopic } from '../../redux/counterargument/counterargSlice'
 import { useLocation } from 'react-router-dom'
 import type { RootState } from '../../redux/store'
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
+
 export default function AddTopic() {
-    const backendServerRoute = 'https://argusure.onrender.com'
     const currentUser = useSelector((state: RootState) => state.user.currentUser)
     const addTopic = useSelector((state: RootState) => state.counterarg.addTopic)
     const [inputTopic, setInputTopic] = useState('')
@@ -26,7 +27,7 @@ export default function AddTopic() {
             topicName: inputTopic
         }
         try {
-            const res = await fetch(backendServerRoute + '/api/saved/addtopic', {
+            const res = await fetch(`${BASE_URL}/api/saved/addtopic`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dataBody)

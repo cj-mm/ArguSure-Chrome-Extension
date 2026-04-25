@@ -20,8 +20,9 @@ import type { RootState } from '../../redux/store'
 import UnsaveModal from './UnsaveModal'
 import SaveTo from './SaveTo'
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
+
 export default function CounterargsContainer({ counterargument, withClaim }) {
-    const backendServerRoute = 'https://argusure.onrender.com'
     const claim =
         counterargument.inputClaim.charAt(0).toUpperCase() + counterargument.inputClaim.slice(1)
     const summary = counterargument.summary
@@ -51,7 +52,7 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
             liked: action
         }
         try {
-            const res = await fetch(backendServerRoute + '/api/counterarg/like', {
+            const res = await fetch(`${BASE_URL}/api/counterarg/like`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dataBody)
@@ -75,7 +76,7 @@ export default function CounterargsContainer({ counterargument, withClaim }) {
             selectedTopics: ['default']
         }
         try {
-            const res = await fetch(backendServerRoute + '/api/saved/save', {
+            const res = await fetch(`${BASE_URL}/api/saved/save`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dataBody)
