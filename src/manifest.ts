@@ -49,7 +49,7 @@ const createBaseManifest = async (): Promise<Manifest> => {
             version: pkg.version,
             description: pkg.description ?? 'GIVE ME A DESCRIPTION',
             action: {
-                default_popup: './src/scripts/popup/popup.html'
+                default_popup: 'src/scripts/popup/popup.html'
             },
             background: {
                 service_worker: 'js/service-worker.js',
@@ -104,9 +104,12 @@ const getManifest = async (resources: string[]): Promise<Manifest> => {
 const readJsFiles = async (dir: string): Promise<string[]> => {
     try {
         const files = await fs.readdir(dir)
-        return files
-            .filter((file: string) => path.extname(file) === '.js')
-            .map((file: string) => path.join(dir, file))
+        return (
+            files
+                .filter((file: string) => path.extname(file) === '.js')
+                // Use forward slashes and paths relative to the dist/ root
+                .map((file: string) => `js/${file}`)
+        )
     } catch (error) {
         console.error(`Error reading JS files from ${dir}:`, error)
         throw error
