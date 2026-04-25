@@ -22,21 +22,17 @@ const config = defineConfig({
     },
 
     build: {
-        watch: {
-            include: ['./src/**/*']
-        },
-
+        // Only enable watch mode during development
+        watch: isDev ? { include: ['./src/**/*'] } : null,
         outDir: r('dist/js'),
         cssCodeSplit: false,
         emptyOutDir: false,
         sourcemap: isDev ? 'inline' : false,
-
         lib: {
             entry: r('src/scripts/content/index.tsx'),
             name: name,
-            formats: ['iife'] // Bundle everything together so chrome.runtime is available in our React app/components.
+            formats: ['iife']
         },
-
         rollupOptions: {
             output: {
                 entryFileNames: 'content.js',
