@@ -1,6 +1,6 @@
 {
-    "name": "special-problem",
-    "longName": "CMSC 190 Special Problem",
+    "name": "argusure-chrome-extension",
+    "longName": "ArguSure",
     "description": "CMSC 190 Special Problem - Counterargument Generator",
     "version": "1.0.0",
     "main": "index.js",
