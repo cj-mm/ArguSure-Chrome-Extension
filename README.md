@@ -141,6 +141,10 @@ The extension requests the following permissions:
 
 ---
 
+For more info, please see [this repository](https://github.com/cj-mm/ArguSure).
+
+---
+
 <div align="center">
   <p>Built by <a href="https://github.com/cj-mm">cj-mm</a></p>
 </div>
